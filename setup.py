@@ -11,9 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
-
-VERSION = "1.1.15"
+from setuptools import setup, find_packages
 
 requirements = [
     # Boto3 is the Amazon Web Services (AWS) Software Development Kit (SDK)
@@ -69,7 +67,8 @@ requirements = [
 
 setup(
     name="confidant-client",
-    version=VERSION,
+    version="1.1.16",
+    packages=find_packages(exclude=["test*"]),
     install_requires=requirements,
     author="Ryan Lane",
     author_email="rlane@lyft.com",

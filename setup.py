@@ -11,7 +11,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 from setuptools import setup, find_packages
+
+
+if sys.version_info[0] != 2:
+    sys.exit("This package only supports Python 2.")
 
 requirements = [
     # Boto3 is the Amazon Web Services (AWS) Software Development Kit (SDK)
@@ -81,4 +87,7 @@ setup(
             "confidant-format = confidant_client.formatter:main"
         ],
     },
+    classifiers=[
+        'Programming Language :: Python :: 2 :: Only',
+    ],
 )

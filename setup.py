@@ -73,7 +73,7 @@ requirements = [
 
 setup(
     name="confidant-client",
-    version="1.1.16",
+    version="1.1.17",
     packages=find_packages(exclude=["test*"]),
     install_requires=requirements,
     author="Ryan Lane",

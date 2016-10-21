@@ -85,7 +85,9 @@ def _parse_args():
     parser.add_argument(
         '-k',
         '--auth-key',
-        help='The KMS auth key to use. i.e. alias/authnz-production'
+        help='The KMS auth key to use. It must either be an ARN (i.e. a string'
+             ' starting with "arn:aws:kms:") or an alias with the prefix'
+             ' "alias/" (i.e. "alias/authnz-production")'
     )
     parser.add_argument(
         '-l',

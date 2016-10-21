@@ -468,10 +468,11 @@ class _HelpAction(argparse._HelpAction):
                 print (subparser.format_help())
 
         print (
-            'example: confidant_client get_service -u'
+            'example: confidant get_service -u'
             ' "https://confidant-production.example.com" -k'
             ' "alias/authnz-production" --from myservice-production'
             ' --to confidant-production --user_type service'
+            ' --region us-west-2 --service myservice-production'
         )
 
         parser.exit()

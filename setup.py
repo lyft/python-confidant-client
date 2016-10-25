@@ -68,7 +68,12 @@ requirements = [
     # License: MIT
     # Upstream url: http://pyyaml.org/wiki/PyYAML
     # Use: For parsing users.yaml
-    'PyYAML>=3.11'
+    'PyYAML>=3.11',
+
+    # License: BSD
+    # Upstream url: http://jinja.pocoo.org/
+    # Use: For generating templated output files from Confidant secrets
+    'jinja2>=2.8'
 ]
 
 setup(

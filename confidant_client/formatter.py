@@ -9,6 +9,7 @@ import sys
 import re
 import pipes
 import os
+import jinja2
 
 import confidant_client
 
@@ -107,6 +108,21 @@ def combined_credential_pair_format(data):
     return ret
 
 
+def jinja_format(data, template_file):
+    class GlobalFileLoader(jinja2.BaseLoader):
+        def get_source(self, environment, template):
+            if not os.path.exists(template):
+                raise jinja2.TemplateNotFound(template)
+            with file(template) as f:
+                source = f.read().decode('utf-8')
+            return source, template, lambda: False
+
+    combined_credentials = combined_credential_pair_format(data)
+    env = jinja2.Environment(loader=GlobalFileLoader())
+    template = env.get_template(template_file)
+    return template.render(secrets=combined_credentials['credentials'])
+
+
 def _valid_key(key):
     if KEY_BAD_PATTERN.search(key):
         msg = ('A key in the returned credential_pairs ({0}) is not a valid'
@@ -131,14 +147,19 @@ def main():
     parser.add_argument(
         '--out-format',
         required=True,
-        help='Format to output: env_export, credential_combined.',
-        choices=['env_export', 'credential_combined']
+        help='Format to output: env_export, credential_combined, jinja.',
+        choices=['env_export', 'credential_combined', 'jinja']
     )
     parser.add_argument(
         '--env-export-prefix',
         help=('Prefix to use for variables exported when using env_export'
               ' format.'),
         default='CREDENTIALS_'
+    )
+    parser.add_argument(
+        '--template',
+        help=('Template file to use when using the jinja format. All available'
+              ' credentials will be provided in a dictionary named `secrets`.')
     )
     parser.add_argument(
         '--out',
@@ -180,6 +201,12 @@ def main():
     elif args.out_format == 'credential_combined':
         ret = combined_credential_pair_format(data)
         ret = json.dumps(ret, sort_keys=True, indent=4, separators=(',', ': '))
+    elif args.out_format == 'jinja':
+        if args.template is None:
+            logging.error('--template is required when using'
+                          ' --out-format=jinja')
+            sys.exit(1)
+        ret = jinja_format(data, args.template)
     else:
         logging.error('Unsupported --out-format.')
         sys.exit(1)

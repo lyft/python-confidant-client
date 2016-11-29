@@ -211,7 +211,7 @@ def main():
         logging.error('Unsupported --out-format.')
         sys.exit(1)
     if args.out == '-':
-        print ret
+        sys.stdout.write(ret)
     else:
         with open(os.path.join(args.out), 'w') as f:
             f.write(ret)

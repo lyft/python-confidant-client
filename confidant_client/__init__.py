@@ -50,7 +50,8 @@ class ConfidantClient(object):
             retries=None,
             backoff=None,
             config_files=None,
-            profile=None
+            profile=None,
+            kms_endpoint_url=None
             ):
         """Create a ConfidantClient object.
 
@@ -78,6 +79,8 @@ class ConfidantClient(object):
             configuration from. First file found will be used. Default:
                 ['~/.confidant', '/etc/confidant/config']
             profile: profile to read config values from.
+            kms_endpoint_url: A URL to override the default endpoint used to
+                access the KMS service. Default: None
         """
         # Set defaults
         self.config = {
@@ -90,7 +93,8 @@ class ConfidantClient(object):
             'assume_role': None,
             'region': None,
             'retries': 0,
-            'backoff': 1
+            'backoff': 1,
+            'kms_endpoint_url': None
         }
         if config_files is None:
             config_files = ['~/.confidant', '/etc/confidant/config']
@@ -108,7 +112,8 @@ class ConfidantClient(object):
             'token_cache_file': token_cache_file,
             'region': region,
             'backoff': backoff,
-            'assume_role': assume_role
+            'assume_role': assume_role,
+            'kms_endpoint_url': kms_endpoint_url
         }
         for key, val in args_config.iteritems():
             if val is not None:
@@ -157,7 +162,8 @@ class ConfidantClient(object):
                 token_version=self.config['token_version'],
                 token_cache_file=self.config['token_cache_file'],
                 token_lifetime=self.config['token_lifetime'],
-                aws_creds=self.aws_creds
+                aws_creds=self.aws_creds,
+                endpoint_url=self.config['kms_endpoint_url']
             )
         except kmsauth.ConfigurationError:
             raise ClientConfigurationError('Error configuring kmsauth client.')

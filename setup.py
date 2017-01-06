@@ -25,20 +25,20 @@ requirements = [
     # License: Apache2
     # Upstream url: https://github.com/boto/boto3
     # Use: For KMS
-    'boto3>=1.2.0,<1.4.0',
+    'boto3>=1.2.0,<2.0.0',
 
     # cryptography is a package which provides cryptographic recipes and
     # primitives to Python developers.
     # License: BSD
     # Upstream url: https://github.com/pyca/cryptography
     # Use: For encryption
-    'cryptography>=1.2.1,<1.3.0',
+    'cryptography>=1.2.1,<2.0.0',
 
     # Python HTTP for Humans.
     # License: Apache2
     # Upstream url: http://python-requests.org
     # Use: REST calls to external services
-    'requests>=2.9.1,<2.10.0',
+    'requests>=2.9.1,<3.0.0',
 
     # A python library for reusing KMS for your own authentication and
     # authorization.
@@ -51,19 +51,19 @@ requirements = [
     # License: BSD
     # Upstream url: https://github.com/cedadev/ndg_httpsclient/
     # Use: Securing requests for python < 2.7.9.
-    'ndg-httpsclient>=0.4.0,<0.5.0',
+    'ndg-httpsclient>=0.4.0,<1.0.0',
 
     # ASN.1 types and codecs
     # License: BSD
     # Upstream url: http://sourceforge.net/projects/pyasn1/
     # Use: Securing requests for python < 2.7.9.
-    'pyasn1>=0.1.9,<0.2.0',
+    'pyasn1>=0.1.9,<1.0.0',
 
     # Python wrapper module around the OpenSSL library
     # License: APL2
     # Upstream url: https://github.com/pyca/pyopenssl
     # Use: Securing requests for python < 2.7.9.
-    'pyOpenSSL>=0.15.1,<0.16.0',
+    'pyOpenSSL>=0.15.1,<17.0.0',
 
     # License: MIT
     # Upstream url: http://pyyaml.org/wiki/PyYAML
@@ -78,7 +78,7 @@ requirements = [
 
 setup(
     name="confidant-client",
-    version="1.2.0",
+    version="1.3.0",
     packages=find_packages(exclude=["test*"]),
     install_requires=requirements,
     author="Ryan Lane",

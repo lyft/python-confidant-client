@@ -85,7 +85,9 @@ def _parse_args():
     parser.add_argument(
         '-k',
         '--auth-key',
-        help='The KMS auth key to use. i.e. alias/authnz-production'
+        help='The KMS auth key to use. It must either be an ARN (i.e. a string'
+             ' starting with "arn:aws:kms:") or an alias with the prefix'
+             ' "alias/" (i.e. "alias/authnz-production")'
     )
     parser.add_argument(
         '-l',
@@ -468,10 +470,11 @@ class _HelpAction(argparse._HelpAction):
                 print (subparser.format_help())
 
         print (
-            'example: confidant_client get_service -u'
+            'example: confidant get_service -u'
             ' "https://confidant-production.example.com" -k'
             ' "alias/authnz-production" --from myservice-production'
             ' --to confidant-production --user_type service'
+            ' --region us-west-2 --service myservice-production'
         )
 
         parser.exit()

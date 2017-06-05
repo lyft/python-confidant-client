@@ -118,7 +118,10 @@ def jinja_format(data, template_file):
             return source, template, lambda: False
 
     combined_credentials = combined_credential_pair_format(data)
-    env = jinja2.Environment(loader=GlobalFileLoader())
+    env = jinja2.Environment(
+        loader=GlobalFileLoader(),
+        keep_trailing_newline=True
+    )
     template = env.get_template(template_file)
     return template.render(secrets=combined_credentials['credentials'])
 
@@ -211,7 +214,7 @@ def main():
         logging.error('Unsupported --out-format.')
         sys.exit(1)
     if args.out == '-':
-        print ret
+        sys.stdout.write(ret)
     else:
         with open(os.path.join(args.out), 'w') as f:
             f.write(ret)

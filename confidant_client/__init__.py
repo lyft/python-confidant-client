@@ -143,7 +143,9 @@ class ConfidantClient(object):
         )
         self.kms_client = confidant_client.services.get_boto_client(
             'kms',
-            region=self.config['region']
+            region=self.config['region'],
+            endpoint_url=self.config['kms_endpoint_url']
+
         )
         if self.config['assume_role']:
             self.aws_creds = self._get_assume_role_creds(
@@ -375,7 +377,8 @@ class ConfidantClient(object):
                 region=self.config['region'],
                 aws_access_key_id=self.aws_creds['AccessKeyId'],
                 aws_secret_access_key=self.aws_creds['SecretAccessKey'],
-                aws_session_token=self.aws_creds['SessionToken']
+                aws_session_token=self.aws_creds['SessionToken'],
+                endpoint_url=self.config['kms_endpoint_url']
             )
         else:
             _kms_client = self.kms_client

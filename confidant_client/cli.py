@@ -43,7 +43,8 @@ def _get_client_from_args(args):
         region=args.region,
         retries=args.retries,
         config_files=config_files,
-        profile=args.profile
+        profile=args.profile,
+        kms_endpoint_url=args.kms_endpoint_url
     )
     return client
 
@@ -132,6 +133,10 @@ def _parse_args():
     parser.add_argument(
         '--region',
         help='Use the specified region for authentication.'
+    )
+    parser.add_argument(
+        '--kms-endpoint-url',
+        help='Use a different endpoint url for the KMS service.'
     )
     parser.add_argument(
         '--log-level',

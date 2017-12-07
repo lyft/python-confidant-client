@@ -110,7 +110,7 @@ class ConfidantClient(object):
             'backoff': backoff,
             'assume_role': assume_role
         }
-        for key, val in args_config.iteritems():
+        for key, val in args_config.items():
             if val is not None:
                 self.config[key] = val
         # Use session to re-try failed requests.
@@ -400,7 +400,7 @@ class ConfidantClient(object):
         """
         data_keys = {}
         _credential_pairs = {}
-        for region, blind_key in blind_keys.iteritems():
+        for region, blind_key in blind_keys.items():
             if self.aws_creds:
                 session = confidant_client.services.get_boto_session(
                     region=region,
@@ -418,7 +418,7 @@ class ConfidantClient(object):
                 blind_key,
                 _kms
             )
-            data_keys[region] = base64.b64encode(data_key['ciphertext'])
+            data_keys[region] = base64.b64encode(data_key['ciphertext'].encode()).decode()
             # TODO: this crypto code needs to come from a library. Right now we
             # only support fernet and cipher_version 2, so we're hardcoding it
             # and ignoring the arguments.
@@ -468,7 +468,7 @@ class ConfidantClient(object):
             'enabled': enabled
         }
         if store_keys:
-            data['credential_keys'] = credential_pairs.keys()
+            data['credential_keys'] = list(credential_pairs.keys())
         try:
             response = self.request_session.post(
                 '{0}/v1/blind_credentials'.format(self.config['url']),
@@ -548,7 +548,7 @@ class ConfidantClient(object):
             data['data_key'] = data_keys
             data['credential_pairs'] = _credential_pairs
             if store_keys:
-                data['credential_keys'] = credential_pairs.keys()
+                data['credential_keys'] = list(credential_pairs.keys())
         if enabled is not None:
             data['enabled'] = enabled
         try:

@@ -16,9 +16,6 @@ import sys
 from setuptools import setup, find_packages
 
 
-if sys.version_info[0] != 2:
-    sys.exit("This package only supports Python 2.")
-
 requirements = [
     # Boto3 is the Amazon Web Services (AWS) Software Development Kit (SDK)
     # for Python.

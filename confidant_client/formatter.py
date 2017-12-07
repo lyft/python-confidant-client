@@ -25,7 +25,7 @@ def bash_export_format(data, prefix):
     blind_credentials = service.get('blind_credentials', [])
     for cred in credentials:
         pairs = cred.get('credential_pairs', {})
-        for key, val in pairs.iteritems():
+        for key, val in pairs.items():
             if not _valid_key(key):
                 continue
             var = ': ${{{0}{1}={2}}}\n'.format(
@@ -44,7 +44,7 @@ def bash_export_format(data, prefix):
             )
     for cred in blind_credentials:
         pairs = cred.get('decrypted_credential_pairs', {})
-        for key, val in pairs.iteritems():
+        for key, val in pairs.items():
             if not _valid_key(key):
                 continue
             var = ': ${{{0}{1}={2}}}\n'.format(
@@ -74,7 +74,7 @@ def combined_credential_pair_format(data):
     credentials = service.get('credentials', [])
     blind_credentials = service.get('blind_credentials', [])
     for credential in credentials:
-        for key, val in credential['credential_pairs'].items():
+        for key, val in list(credential['credential_pairs'].items()):
             if key in credential_pairs:
                 msg = 'Credential {0} ({1}) has a conflicting credential pair.'
                 logging.warning(
@@ -87,7 +87,7 @@ def combined_credential_pair_format(data):
             'name': credential['name']
         })
     for credential in blind_credentials:
-        for key, val in credential['decrypted_credential_pairs'].items():
+        for key, val in list(credential['decrypted_credential_pairs'].items()):
             if key in credential_pairs:
                 msg = ('Blind credential {0} ({1}) has a conflicting'
                        ' credential pair.')

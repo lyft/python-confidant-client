@@ -418,7 +418,7 @@ class ConfidantClient(object):
                 blind_key,
                 _kms
             )
-            data_keys[region] = base64.b64encode(data_key['ciphertext'])
+            data_keys[region] = base64.b64encode(data_key['ciphertext'].encode()).decode()
             # TODO: this crypto code needs to come from a library. Right now we
             # only support fernet and cipher_version 2, so we're hardcoding it
             # and ignoring the arguments.

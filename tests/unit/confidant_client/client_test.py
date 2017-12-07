@@ -174,7 +174,7 @@ class ClientTest(unittest.TestCase):
              'user_type': 'service'},
         )
         token = client._get_token()
-        self.assertEqual(token, base64.b64encode('encrypted'))
+        self.assertEqual(token, base64.b64encode('encrypted'.encode()))
 
     @patch(
         'confidant_client.services.get_boto_client',

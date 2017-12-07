@@ -2,6 +2,8 @@
 """Confidant cli module."""
 
 # Import python libs
+from __future__ import absolute_import
+from __future__ import print_function
 import logging
 import json
 import argparse
@@ -447,7 +449,7 @@ def main():
         except Exception:
             logging.exception('An unexpected general error occurred.')
 
-    print json.dumps(ret, sort_keys=True, indent=4, separators=(',', ': '))
+    print(json.dumps(ret, sort_keys=True, indent=4, separators=(',', ': ')))
     if not ret['result']:
         sys.exit(1)
 
@@ -457,7 +459,7 @@ class _HelpAction(argparse._HelpAction):
 
     def __call__(self, parser, namespace, values, option_string=None):
         parser.print_help()
-        print ''
+        print('')
 
         # retrieve subparsers from parser
         subparsers_actions = [
@@ -466,10 +468,10 @@ class _HelpAction(argparse._HelpAction):
         for subparsers_action in subparsers_actions:
             # get all subparsers and print help
             for choice, subparser in subparsers_action.choices.items():
-                print ('Subcommand \'{0}\':'.format(choice))
-                print (subparser.format_help())
+                print('Subcommand \'{0}\':'.format(choice))
+                print(subparser.format_help())
 
-        print (
+        print(
             'example: confidant get_service -u'
             ' "https://confidant-production.example.com" -k'
             ' "alias/authnz-production" --from myservice-production'

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import unittest
 import base64
 import copy
@@ -174,7 +175,7 @@ class ClientTest(unittest.TestCase):
              'user_type': 'service'},
         )
         token = client._get_token()
-        self.assertEqual(token, base64.b64encode('encrypted'))
+        self.assertEqual(token, base64.b64encode(b'encrypted'))
 
     @patch(
         'confidant_client.services.get_boto_client',

@@ -120,7 +120,7 @@ class ConfidantClient(object):
             'backoff': backoff,
             'assume_role': assume_role
         }
-        for key, val in six.iteritems(args_config):
+        for key, val in args_config.items():
             if val is not None:
                 self.config[key] = val
         # Use session to re-try failed requests.

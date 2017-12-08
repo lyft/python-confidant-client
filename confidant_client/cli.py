@@ -469,7 +469,7 @@ class _HelpAction(argparse._HelpAction):
             # get all subparsers and print help
             for choice, subparser in subparsers_action.choices.items():
                 print('Subcommand \'{0}\':'.format(choice))
-                print(subparser.format_help())
+                subparser.print_help()
 
         print(
             'example: confidant get_service -u'

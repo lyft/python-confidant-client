@@ -42,7 +42,7 @@ requirements = [
     # Licence: Apache2
     # Upstream url: https://github.com/lyft/python-kmsauth
     # Use: client authentication to confidant
-    'kmsauth>=0.1.6,<1.0.0',
+    'kmsauth>=0.3.0,<1.0.0',
 
     # Provides enhanced HTTPS support for httplib and urllib2 using PyOpenSSL
     # License: BSD
@@ -80,7 +80,7 @@ requirements = [
 
 setup(
     name="confidant-client",
-    version="1.3.0",
+    version="1.4.0",
     packages=find_packages(exclude=["test*"]),
     install_requires=requirements,
     author="Ryan Lane",

@@ -11,13 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
+from __future__ import absolute_import
 
 from setuptools import setup, find_packages
 
-
-if sys.version_info[0] != 2:
-    sys.exit("This package only supports Python 2.")
 
 requirements = [
     # Boto3 is the Amazon Web Services (AWS) Software Development Kit (SDK)
@@ -32,7 +29,7 @@ requirements = [
     # License: BSD
     # Upstream url: https://github.com/pyca/cryptography
     # Use: For encryption
-    'cryptography>=1.2.1,<2.0.0',
+    'cryptography>=1.2.1,<3.0.0',
 
     # Python HTTP for Humans.
     # License: Apache2
@@ -63,7 +60,7 @@ requirements = [
     # License: APL2
     # Upstream url: https://github.com/pyca/pyopenssl
     # Use: Securing requests for python < 2.7.9.
-    'pyOpenSSL>=0.15.1,<17.0.0',
+    'pyOpenSSL>=0.15.1,<18.0.0',
 
     # License: MIT
     # Upstream url: http://pyyaml.org/wiki/PyYAML
@@ -73,7 +70,12 @@ requirements = [
     # License: BSD
     # Upstream url: http://jinja.pocoo.org/
     # Use: For generating templated output files from Confidant secrets
-    'jinja2>=2.8'
+    'jinja2>=2.8',
+
+    # License: MIT
+    # Upstream url: https://github.com/benjaminp/six
+    # Use: Python 2/3 compatiability
+    'six>=1.10.0',
 ]
 
 setup(
@@ -93,6 +95,11 @@ setup(
         ],
     },
     classifiers=[
-        'Programming Language :: Python :: 2 :: Only',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 )

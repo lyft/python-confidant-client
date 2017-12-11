@@ -1,6 +1,7 @@
 # Make the tests directory a python module
 # so that all unit tests are reported as part of the tests package.
 
+from __future__ import absolute_import
 import os
 
 # Inject mandatory environment variables

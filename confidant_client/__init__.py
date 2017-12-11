@@ -1,5 +1,6 @@
 """A client module for Confidant."""
 
+from __future__ import absolute_import
 import logging
 import json
 import base64
@@ -9,10 +10,11 @@ import yaml
 # Import third party libs
 import requests
 import boto3
+import kmsauth
+import six
 from cryptography.fernet import Fernet
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util import Retry
-import kmsauth
 
 import confidant_client.workarounds  # noqa
 import confidant_client.services
@@ -30,6 +32,14 @@ VERSION = '1.1.15'
 JSON_HEADERS = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 TOKEN_SKEW = 3
 TIME_FORMAT = "%Y%m%dT%H%M%SZ"
+
+
+def ensure_bytes(str_or_bytes, encoding='utf-8', errors='strict'):
+    """Ensures an input is bytes, encoding if it is a string.
+    """
+    if isinstance(str_or_bytes, six.text_type):
+        return str_or_bytes.encode(encoding, errors)
+    return str_or_bytes
 
 
 class ConfidantClient(object):
@@ -110,7 +120,7 @@ class ConfidantClient(object):
             'backoff': backoff,
             'assume_role': assume_role
         }
-        for key, val in args_config.iteritems():
+        for key, val in args_config.items():
             if val is not None:
                 self.config[key] = val
         # Use session to re-try failed requests.
@@ -297,7 +307,9 @@ class ConfidantClient(object):
                     data['blind_credentials']
                 )
         except ValueError:
-            logging.error('Received badly formatted json data from confidant.')
+            logging.exception(
+                'Received badly formatted json data from confidant.'
+            )
             return ret
         ret['service'] = data
         ret['result'] = True
@@ -374,7 +386,9 @@ class ConfidantClient(object):
         else:
             _kms_client = self.kms_client
         _data_key = cryptolib.decrypt_datakey(
-            base64.b64decode(credential['data_key'][region]),
+            base64.b64decode(
+                ensure_bytes(credential['data_key'][region])
+            ),
             _context,
             _kms_client
         )
@@ -400,7 +414,7 @@ class ConfidantClient(object):
         """
         data_keys = {}
         _credential_pairs = {}
-        for region, blind_key in blind_keys.iteritems():
+        for region, blind_key in six.iteritems(blind_keys):
             if self.aws_creds:
                 session = confidant_client.services.get_boto_session(
                     region=region,
@@ -418,7 +432,9 @@ class ConfidantClient(object):
                 blind_key,
                 _kms
             )
-            data_keys[region] = base64.b64encode(data_key['ciphertext'])
+            data_keys[region] = base64.b64encode(
+                ensure_bytes(data_key['ciphertext'])
+            ).decode('ascii')
             # TODO: this crypto code needs to come from a library. Right now we
             # only support fernet and cipher_version 2, so we're hardcoding it
             # and ignoring the arguments.
@@ -429,7 +445,7 @@ class ConfidantClient(object):
             del data_key['plaintext']
             _credential_pairs[region] = f.encrypt(
                 json.dumps(credential_pairs).encode('utf-8')
-            )
+            ).decode('ascii')
         return data_keys, _credential_pairs
 
     def create_blind_credential(
@@ -468,7 +484,7 @@ class ConfidantClient(object):
             'enabled': enabled
         }
         if store_keys:
-            data['credential_keys'] = credential_pairs.keys()
+            data['credential_keys'] = list(credential_pairs.keys())
         try:
             response = self.request_session.post(
                 '{0}/v1/blind_credentials'.format(self.config['url']),
@@ -548,7 +564,7 @@ class ConfidantClient(object):
             data['data_key'] = data_keys
             data['credential_pairs'] = _credential_pairs
             if store_keys:
-                data['credential_keys'] = credential_pairs.keys()
+                data['credential_keys'] = list(credential_pairs.keys())
         if enabled is not None:
             data['enabled'] = enabled
         try:

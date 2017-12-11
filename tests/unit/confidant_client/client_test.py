@@ -394,7 +394,7 @@ class ClientTest(unittest.TestCase):
         )
         with patch('confidant_client.Fernet') as MockFernet:
             mock_encrypt = MagicMock()
-            mock_encrypt.return_value = 'encrypted'
+            mock_encrypt.return_value = b'encrypted'
             instance = MagicMock()
             instance.encrypt = mock_encrypt
             MockFernet.return_value = instance

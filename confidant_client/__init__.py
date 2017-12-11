@@ -34,14 +34,6 @@ TOKEN_SKEW = 3
 TIME_FORMAT = "%Y%m%dT%H%M%SZ"
 
 
-def ensure_text(str_or_bytes, encoding='utf-8'):
-    """Ensures an input is a string, decoding if it is bytes.
-    """
-    if not isinstance(str_or_bytes, six.text_type):
-        return str_or_bytes.decode(encoding)
-    return str_or_bytes
-
-
 def ensure_bytes(str_or_bytes, encoding='utf-8', errors='strict'):
     """Ensures an input is bytes, encoding if it is a string.
     """
@@ -440,11 +432,9 @@ class ConfidantClient(object):
                 blind_key,
                 _kms
             )
-            data_keys[region] = ensure_text(
-                base64.b64encode(
-                    ensure_bytes(data_key['ciphertext'])
-                )
-            )
+            data_keys[region] = base64.b64encode(
+                ensure_bytes(data_key['ciphertext'])
+            ).decode('ascii')
             # TODO: this crypto code needs to come from a library. Right now we
             # only support fernet and cipher_version 2, so we're hardcoding it
             # and ignoring the arguments.
@@ -453,9 +443,9 @@ class ConfidantClient(object):
             # data_key, incase someone decides later to include the data_key
             # directly into the return.
             del data_key['plaintext']
-            _credential_pairs[region] = ensure_text(
-                f.encrypt(json.dumps(credential_pairs).encode('utf-8'))
-            )
+            _credential_pairs[region] = f.encrypt(
+                json.dumps(credential_pairs).encode('utf-8')
+            ).decode('ascii')
         return data_keys, _credential_pairs
 
     def create_blind_credential(

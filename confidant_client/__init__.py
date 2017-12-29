@@ -281,11 +281,15 @@ class ConfidantClient(object):
         # Make a request to confidant with the provided url, to fetch the
         # service providing the service name and base64 encoded
         # token for authentication.
-        response = self._execute_request(
-            'get',
-            '{0}/v1/services/{1}'.format(self.config['url'], service),
-            expected_return_codes=[202, 404]
-        )
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/services/{1}'.format(self.config['url'], service),
+                expected_return_codes=[200, 404]
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
         if response.status_code == 404:
             logging.debug('Service not found in confidant.')
             ret['result'] = True
@@ -313,11 +317,15 @@ class ConfidantClient(object):
         # Make a request to confidant with the provided url, to fetch the
         # service providing the service name and base64 encoded
         # token for authentication.
-        response = self._execute_request(
-            'get',
-            '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id),
-            expected_return_codes=[202, 404]
-        )
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id),
+                expected_return_codes=[200, 404]
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
         if response.status_code == 404:
             logging.debug('Blind credential not found in confidant.')
             ret['result'] = False
@@ -435,10 +443,14 @@ class ConfidantClient(object):
             ):
         ret = {'result': False}
         # Find the current revision
-        response = self._execute_request(
-            'get',
-            '{0}/v1/credentials/{1}'.format(self.config['url'], id)
-        )
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/credentials/{1}'.format(self.config['url'], id)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
         current_cred_revision = response.json()
         if current_cred_revision['revision'] == 1:
             logging.error('This credential has no previous revision')
@@ -453,25 +465,33 @@ class ConfidantClient(object):
         logging.info(
             'Attempting to revert credential to revision {}'.format(revision)
         )
-        response = self._execute_request(
-            'get',
-            '{0}/v1/credentials/{1}-{2}'.format(
-                self.config['url'], id, revision
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/credentials/{1}-{2}'.format(
+                    self.config['url'], id, revision
+                )
             )
-        )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
         cred_revision = response.json()
         if self._identical_fields(
                 current_cred_revision, cred_revision,
                 ['name', 'credential_pairs', 'metadata', 'enabled']):
-            logger.error('Cannot revert to revision {}. No difference between '
+            logging.error('Cannot revert to revision {}. No difference between '
                          'it and current revision.'.format(revision))
             return ret
-        response = self._execute_request(
-            'put',
-            '{0}/v1/credentials/{1}'.format(self.config['url'], id),
-            headers=JSON_HEADERS,
-            data=json.dumps(cred_revision)
-        )
+        try:
+            response = self._execute_request(
+                'put',
+                '{0}/v1/credentials/{1}'.format(self.config['url'], id),
+                headers=JSON_HEADERS,
+                data=json.dumps(cred_revision)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
         try:
             data = response.json()
         except ValueError:
@@ -494,6 +514,12 @@ class ConfidantClient(object):
             revision=None
             ):
         pass
+
+    def _identical_fields(self, a, b, fields):
+        for field in fields:
+            if a.get(field) != b.get(field):
+                return False
+        return True
 
     def create_blind_credential(
             self,
@@ -532,13 +558,17 @@ class ConfidantClient(object):
         }
         if store_keys:
             data['credential_keys'] = list(credential_pairs.keys())
-        response = self._execute_request(
-            'post',
-            '{0}/v1/blind_credentials'.format(self.config['url']),
-            timeout=5,
-            headers=JSON_HEADERS,
-            data=json.dumps(data),
-        )
+        try:
+            response = self._execute_request(
+                'post',
+                '{0}/v1/blind_credentials'.format(self.config['url']),
+                timeout=5,
+                headers=JSON_HEADERS,
+                data=json.dumps(data),
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
         try:
             data = response.json()
         except ValueError:
@@ -604,13 +634,17 @@ class ConfidantClient(object):
                 data['credential_keys'] = list(credential_pairs.keys())
         if enabled is not None:
             data['enabled'] = enabled
-        response = self._execute_request(
-            'put',
-            '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id),
-            timeout=5,
-            headers=JSON_HEADERS,
-            data=json.dumps(data)
-        )
+        try:
+            response = self._execute_request(
+                'put',
+                '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id),
+                timeout=5,
+                headers=JSON_HEADERS,
+                data=json.dumps(data)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
         try:
             data = response.json()
         except ValueError:
@@ -628,10 +662,14 @@ class ConfidantClient(object):
         # Make a request to confidant with the provided url, to fetch the
         # service providing the service name and base64 encoded
         # token for authentication.
-        response = self._execute_request(
-            'get',
-            '{0}/v1/blind_credentials'.format(self.config['url'])
-        )
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/blind_credentials'.format(self.config['url'])
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
         try:
             data = response.json()
         except ValueError:
@@ -645,11 +683,10 @@ class ConfidantClient(object):
             self,
             method,
             url,
-            expected_return_codes=[202, 404],
+            expected_return_codes=[200, 404],
             timeout=2,
             **kwargs
             ):
-        ret = {'result': False}
         try:
             if method == 'get':
                 response = self.request_session.get(
@@ -678,14 +715,12 @@ class ConfidantClient(object):
             else:
                 raise ValueError('Unexpected method: {}'.format(method))
         except requests.ConnectionError:
-            logging.error('Failed to connect to confidant.')
-            return ret
+            raise RequestExecutionError('Failed to connect to confidant.')
         except requests.Timeout:
-            logging.error('Confidant request timed out.')
-            return ret
+            raise RequestExecutionError('Confidant request timed out.')
         if not self._check_response_code(
                 response, expected=expected_return_codes):
-            return ret
+            raise RequestExecutionError('Unexpected return code')
         return response
 
 
@@ -700,4 +735,10 @@ class ClientConfigurationError(Exception):
 
     """An exception raised when the client has been invalidly configured."""
 
+    pass
+
+
+class RequestExecutionError(Exception):
+
+    """An exception raised when a request to Confidant failed."""
     pass

@@ -365,6 +365,21 @@ def _parse_args():
 
     subparsers.add_parser('list_blind_credentials')
 
+    revert_cred_parser = subparsers.add_parser('revert_credential')
+    revert_cred_parser.add_argument(
+        '--id',
+        required=True,
+        help=('An id for this credential i.e.'
+              ' \'f232fcd3747c47718e48a034f4cdfc0e\'.'),
+        dest='_id'
+    )
+    revert_cred_parser.add_argument(
+        '--revision',
+        help=('The revision number to revert to. Omit if you want to restore '
+              'the most recent revision.'),
+        type=int
+    )
+
     return parser.parse_args()
 
 
@@ -446,6 +461,11 @@ def main():
     elif args.subcommand == 'list_blind_credentials':
         try:
             ret = client.list_blind_credentials()
+        except Exception:
+            logging.exception('An unexpected general error occurred.')
+    elif args.subcommand == 'revert_credential':
+        try:
+            ret = client.revert_credential(args._id, args.revision)
         except Exception:
             logging.exception('An unexpected general error occurred.')
 

@@ -515,14 +515,149 @@ class ConfidantClient(object):
             id,
             revision=None
             ):
-        pass
+        """Reverts a service to a previous revision.
+
+        Args:
+            id: The ID of the service.
+            revision: The revision number to revert to, or None to revert to
+                the immediately previous revision.
+        """
+        # Return a dict, always with an attribute that specifies whether or not
+        # the function was able to successfully get a result.
+        ret = {'result': False}
+        # Find the current revision
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/service/{1}'.format(self.config['url'], id)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        current_service_revision = response.json()
+        if current_service_revision['revision'] == 1:
+            logging.error('This service has no previous revision')
+            return ret
+        if revision:
+            if revision == current_service_revision['revision']:
+                logging.error('Revision number is the same as current revision')
+                return ret
+        else:
+            # Set revision to the second most recent.
+            revision = current_service_revision['revision'] - 1
+        logging.info(
+            'Attempting to revert service to revision {}'.format(revision)
+        )
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/services/{1}-{2}'.format(
+                    self.config['url'], id, revision
+                )
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        service_revision = response.json()
+        if self._identical_fields(
+                current_service_revision, service_revision,
+                ['credentials', 'blind_credentials', 'enabled']):
+            logging.error('Cannot revert to revision {}. No difference between '
+                         'it and current revision.'.format(revision))
+            return ret
+        try:
+            response = self._execute_request(
+                'put',
+                '{0}/v1/services/{1}'.format(self.config['url'], id),
+                headers=JSON_HEADERS,
+                data=json.dumps(service_revision)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        try:
+            data = response.json()
+        except ValueError:
+            logging.error('Received badly formatted json data from confidant.')
+            return ret
+        ret['service'] = data
+        ret['result'] = True
+        return ret
 
     def revert_blind_credential(
             self,
             id,
             revision=None
             ):
-        pass
+        """Reverts a blind credential to a previous revision.
+
+        Args:
+            id: The ID of the blind credential.
+            revision: The revision number to revert to, or None to revert to
+                the immediately previous revision.
+        """
+        # Return a dict, always with an attribute that specifies whether or not
+        # the function was able to successfully get a result.
+        ret = {'result': False}
+        # Find the current revision
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        current_cred_revision = response.json()
+        if current_cred_revision['revision'] == 1:
+            logging.error('This blind credential has no previous revision')
+            return ret
+        if revision:
+            if revision == current_cred_revision['revision']:
+                logging.error('Revision number is the same as current revision')
+                return ret
+        else:
+            # Set revision to the second most recent.
+            revision = current_cred_revision['revision'] - 1
+        logging.info(
+            'Attempting to revert credential to revision {}'.format(revision)
+        )
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/blind_credentials/{1}-{2}'.format(
+                    self.config['url'], id, revision
+                )
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        cred_revision = response.json()
+        if self._identical_fields(
+                current_cred_revision, cred_revision,
+                ['name', 'credential_keys', 'credential_pairs', 'metadata',
+                 'enabled']):
+            logging.error('Cannot revert to revision {}. No difference between '
+                         'it and current revision.'.format(revision))
+            return ret
+        try:
+            response = self._execute_request(
+                'put',
+                '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id),
+                headers=JSON_HEADERS,
+                data=json.dumps(cred_revision)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        try:
+            data = response.json()
+        except ValueError:
+            logging.error('Received badly formatted json data from confidant.')
+            return ret
+        ret['blind_credential'] = data
+        ret['result'] = True
+        return ret
 
     def _identical_fields(self, a, b, fields):
         for field in fields:

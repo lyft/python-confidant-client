@@ -441,6 +441,15 @@ class ConfidantClient(object):
             id,
             revision=None
             ):
+        """Reverts a credential to a previous revision.
+
+        Args:
+            id: The ID of the credential.
+            revision: The revision number to revert to, or None to revert to
+                the immediately previous revision.
+        """
+        # Return a dict, always with an attribute that specifies whether or not
+        # the function was able to successfully get a result.
         ret = {'result': False}
         # Find the current revision
         try:

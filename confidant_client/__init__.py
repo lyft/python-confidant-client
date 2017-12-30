@@ -529,12 +529,13 @@ class ConfidantClient(object):
         try:
             response = self._execute_request(
                 'get',
-                '{0}/v1/service/{1}'.format(self.config['url'], id)
+                '{0}/v1/archive/services/{1}'.format(self.config['url'], id)
             )
         except RequestExecutionError:
             logging.exception('Error with executing request')
             return ret
-        current_service_revision = response.json()
+        service_revisions = response.json()['revisions']
+        current_service_revision = service_revisions[0]
         if current_service_revision['revision'] == 1:
             logging.error('This service has no previous revision')
             return ret
@@ -548,17 +549,14 @@ class ConfidantClient(object):
         logging.info(
             'Attempting to revert service to revision {}'.format(revision)
         )
-        try:
-            response = self._execute_request(
-                'get',
-                '{0}/v1/services/{1}-{2}'.format(
-                    self.config['url'], id, revision
-                )
-            )
-        except RequestExecutionError:
-            logging.exception('Error with executing request')
+        service_revision = None
+        for r in service_revisions:
+            if r['revision'] == revision:
+                service_revision = r
+                break
+        if not service_revision:
+            logging.error('Cannot find revision {}'.format(revision))
             return ret
-        service_revision = response.json()
         if self._identical_fields(
                 current_service_revision, service_revision,
                 ['credentials', 'blind_credentials', 'enabled']):
@@ -827,7 +825,7 @@ class ConfidantClient(object):
             self,
             method,
             url,
-            expected_return_codes=[200, 404],
+            expected_return_codes=[200],
             timeout=2,
             **kwargs
             ):

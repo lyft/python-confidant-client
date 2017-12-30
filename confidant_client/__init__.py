@@ -488,8 +488,9 @@ class ConfidantClient(object):
         if self._identical_fields(
                 current_cred_revision, cred_revision,
                 ['name', 'credential_pairs', 'metadata', 'enabled']):
-            logging.error('Cannot revert to revision {}. No difference between '
-                         'it and current revision.'.format(revision))
+            logging.error(
+                'Cannot revert to revision {}. No difference between '
+                'it and current revision.'.format(revision))
             return ret
         try:
             response = self._execute_request(
@@ -560,8 +561,9 @@ class ConfidantClient(object):
         if self._identical_fields(
                 current_service_revision, service_revision,
                 ['credentials', 'blind_credentials', 'enabled']):
-            logging.error('Cannot revert to revision {}. No difference between '
-                         'it and current revision.'.format(revision))
+            logging.error(
+                'Cannot revert to revision {}. No difference between '
+                'it and current revision.'.format(revision))
             return ret
         try:
             response = self._execute_request(
@@ -635,8 +637,9 @@ class ConfidantClient(object):
                 current_cred_revision, cred_revision,
                 ['name', 'credential_keys', 'credential_pairs', 'metadata',
                  'enabled']):
-            logging.error('Cannot revert to revision {}. No difference between '
-                         'it and current revision.'.format(revision))
+            logging.error(
+                'Cannot revert to revision {}. No difference between '
+                'it and current revision.'.format(revision))
             return ret
         try:
             response = self._execute_request(

@@ -442,7 +442,8 @@ class ConfidantClient(object):
             cipher_type='fernet',
             cipher_version=2,
             store_keys=True,
-            enabled=True
+            enabled=True,
+            documentation=None
             ):
         """Create a server blinded credential and store it in Confidant."""
         # Return a dict, always with an attribute that specifies whether or not
@@ -465,7 +466,8 @@ class ConfidantClient(object):
             'metadata': metadata,
             'cipher_type': cipher_type,
             'cipher_version': cipher_version,
-            'enabled': enabled
+            'enabled': enabled,
+            'documentation': documentation
         }
         if store_keys:
             data['credential_keys'] = credential_pairs.keys()
@@ -506,7 +508,8 @@ class ConfidantClient(object):
             cipher_type=None,
             cipher_version=None,
             store_keys=True,
-            enabled=None
+            enabled=None,
+            documentation=None
             ):
         """Update a server blinded credential in Confidant."""
         # Return a dict, always with an attribute that specifies whether or not
@@ -525,6 +528,8 @@ class ConfidantClient(object):
             _context = data['metadata']['context']
             data['metadata'] = metadata
             data['metadata']['context'] = _context
+        if documentation is not None:
+            data['documentation'] = documentation
         if credential_pairs is not None:
             if contexts is not None:
                 data['metadata']['context'] = contexts

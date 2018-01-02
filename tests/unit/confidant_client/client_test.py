@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import unittest
 import base64
 import copy
@@ -174,7 +175,7 @@ class ClientTest(unittest.TestCase):
              'user_type': 'service'},
         )
         token = client._get_token()
-        self.assertEqual(token, base64.b64encode('encrypted'))
+        self.assertEqual(token, base64.b64encode(b'encrypted'))
 
     @patch(
         'confidant_client.services.get_boto_client',
@@ -393,7 +394,7 @@ class ClientTest(unittest.TestCase):
         )
         with patch('confidant_client.Fernet') as MockFernet:
             mock_encrypt = MagicMock()
-            mock_encrypt.return_value = 'encrypted'
+            mock_encrypt.return_value = b'encrypted'
             instance = MagicMock()
             instance.encrypt = mock_encrypt
             MockFernet.return_value = instance

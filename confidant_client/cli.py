@@ -2,6 +2,8 @@
 """Confidant cli module."""
 
 # Import python libs
+from __future__ import absolute_import
+from __future__ import print_function
 import logging
 import json
 import argparse
@@ -85,7 +87,9 @@ def _parse_args():
     parser.add_argument(
         '-k',
         '--auth-key',
-        help='The KMS auth key to use. i.e. alias/authnz-production'
+        help='The KMS auth key to use. It must either be an ARN (i.e. a string'
+             ' starting with "arn:aws:kms:") or an alias with the prefix'
+             ' "alias/" (i.e. "alias/authnz-production")'
     )
     parser.add_argument(
         '-l',
@@ -455,7 +459,7 @@ def main():
         except Exception:
             logging.exception('An unexpected general error occurred.')
 
-    print json.dumps(ret, sort_keys=True, indent=4, separators=(',', ': '))
+    print(json.dumps(ret, sort_keys=True, indent=4, separators=(',', ': ')))
     if not ret['result']:
         sys.exit(1)
 
@@ -465,7 +469,7 @@ class _HelpAction(argparse._HelpAction):
 
     def __call__(self, parser, namespace, values, option_string=None):
         parser.print_help()
-        print ''
+        print('')
 
         # retrieve subparsers from parser
         subparsers_actions = [
@@ -474,14 +478,15 @@ class _HelpAction(argparse._HelpAction):
         for subparsers_action in subparsers_actions:
             # get all subparsers and print help
             for choice, subparser in subparsers_action.choices.items():
-                print ('Subcommand \'{0}\':'.format(choice))
-                print (subparser.format_help())
+                print('Subcommand \'{0}\':'.format(choice))
+                subparser.print_help()
 
-        print (
-            'example: confidant_client get_service -u'
+        print(
+            'example: confidant get_service -u'
             ' "https://confidant-production.example.com" -k'
             ' "alias/authnz-production" --from myservice-production'
             ' --to confidant-production --user_type service'
+            ' --region us-west-2 --service myservice-production'
         )
 
         parser.exit()

@@ -2,14 +2,16 @@
 """Confidant formatting module."""
 
 # Import python libs
-import logging
-import json
+from __future__ import absolute_import
 import argparse
-import sys
-import re
-import pipes
-import os
 import jinja2
+import json
+import logging
+import os
+import pipes
+import re
+import six
+import sys
 
 import confidant_client
 
@@ -25,13 +27,13 @@ def bash_export_format(data, prefix):
     blind_credentials = service.get('blind_credentials', [])
     for cred in credentials:
         pairs = cred.get('credential_pairs', {})
-        for key, val in pairs.iteritems():
+        for key, val in six.iteritems(pairs):
             if not _valid_key(key):
                 continue
             var = ': ${{{0}{1}={2}}}\n'.format(
                 prefix.upper(),
                 key.upper(),
-                pipes.quote(val.encode('utf-8'))
+                pipes.quote(val)
             )
             exp = 'export {0}{1}\n'.format(
                 prefix.upper(),
@@ -44,13 +46,13 @@ def bash_export_format(data, prefix):
             )
     for cred in blind_credentials:
         pairs = cred.get('decrypted_credential_pairs', {})
-        for key, val in pairs.iteritems():
+        for key, val in six.iteritems(pairs):
             if not _valid_key(key):
                 continue
             var = ': ${{{0}{1}={2}}}\n'.format(
                 prefix.upper(),
                 key.upper(),
-                pipes.quote(val.encode('utf-8'))
+                pipes.quote(val)
             )
             exp = 'export {0}{1}\n'.format(
                 prefix.upper(),
@@ -113,12 +115,15 @@ def jinja_format(data, template_file):
         def get_source(self, environment, template):
             if not os.path.exists(template):
                 raise jinja2.TemplateNotFound(template)
-            with file(template) as f:
+            with open(template) as f:
                 source = f.read().decode('utf-8')
             return source, template, lambda: False
 
     combined_credentials = combined_credential_pair_format(data)
-    env = jinja2.Environment(loader=GlobalFileLoader())
+    env = jinja2.Environment(
+        loader=GlobalFileLoader(),
+        keep_trailing_newline=True
+    )
     template = env.get_template(template_file)
     return template.render(secrets=combined_credentials['credentials'])
 
@@ -211,10 +216,11 @@ def main():
         logging.error('Unsupported --out-format.')
         sys.exit(1)
     if args.out == '-':
-        print ret
+        sys.stdout.write(ret)
     else:
         with open(os.path.join(args.out), 'w') as f:
             f.write(ret)
+
 
 if __name__ == '__main__':
     main()

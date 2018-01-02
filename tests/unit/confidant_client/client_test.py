@@ -502,7 +502,8 @@ class ClientTest(unittest.TestCase):
                 'data_key': {
                     'us-east-1': 'ZW5jcnlwdGVkX2RhdGFrZXk='
                 },
-                'enabled': True
+                'enabled': True,
+                'documentation': 'how to rotate secret'
             }
         }
         client.get_blind_credential = MagicMock(

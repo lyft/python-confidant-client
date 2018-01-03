@@ -250,6 +250,10 @@ def _parse_args():
         action='store_false',
         dest='enabled'
     )
+    create_blind_cred_parser.add_argument(
+        '--documentation',
+        help='Documentation on how to rotate this credential'
+    )
     create_blind_cred_parser.set_defaults(
         store_keys=True,
         enabled=True
@@ -339,6 +343,10 @@ def _parse_args():
         action='store_false',
         dest='enabled'
     )
+    update_blind_cred_parser.add_argument(
+        '--documentation',
+        help='Documentation on how to rotate this credential'
+    )
     update_blind_cred_parser.set_defaults(
         enabled=None,
         store_keys=True
@@ -410,7 +418,8 @@ def main():
                 args.cipher_type,
                 args.cipher_version,
                 args.store_keys,
-                args.enabled
+                args.enabled,
+                args.documentation
             )
         except Exception:
             logging.exception('An unexpected general error occurred.')
@@ -434,7 +443,8 @@ def main():
                 args.cipher_type,
                 args.cipher_version,
                 args.store_keys,
-                args.enabled
+                args.enabled,
+                args.documentation
             )
         except Exception:
             logging.exception('An unexpected general error occurred.')

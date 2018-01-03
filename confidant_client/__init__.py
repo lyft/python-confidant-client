@@ -278,23 +278,17 @@ class ConfidantClient(object):
         # Return a dict, always with an attribute that specifies whether or not
         # the function was able to successfully get a result.
         ret = {'result': False}
+        # Make a request to confidant with the provided url, to fetch the
+        # service providing the service name and base64 encoded
+        # token for authentication.
         try:
-            # Make a request to confidant with the provided url, to fetch the
-            # service providing the service name and base64 encoded
-            # token for authentication.
-            response = self.request_session.get(
+            response = self._execute_request(
+                'get',
                 '{0}/v1/services/{1}'.format(self.config['url'], service),
-                auth=(self._get_username(), self._get_token()),
-                allow_redirects=False,
-                timeout=2
+                expected_return_codes=[200, 404]
             )
-        except requests.ConnectionError:
-            logging.error('Failed to connect to confidant.')
-            return ret
-        except requests.Timeout:
-            logging.error('Confidant request timed out.')
-            return ret
-        if not self._check_response_code(response, expected=[200, 404]):
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
             return ret
         if response.status_code == 404:
             logging.debug('Service not found in confidant.')
@@ -320,23 +314,17 @@ class ConfidantClient(object):
         # Return a dict, always with an attribute that specifies whether or not
         # the function was able to successfully get a result.
         ret = {'result': False}
+        # Make a request to confidant with the provided url, to fetch the
+        # service providing the service name and base64 encoded
+        # token for authentication.
         try:
-            # Make a request to confidant with the provided url, to fetch the
-            # service providing the service name and base64 encoded
-            # token for authentication.
-            response = self.request_session.get(
+            response = self._execute_request(
+                'get',
                 '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id),
-                auth=(self._get_username(), self._get_token()),
-                allow_redirects=False,
-                timeout=2
+                expected_return_codes=[200, 404]
             )
-        except requests.ConnectionError:
-            logging.error('Failed to connect to confidant.')
-            return ret
-        except requests.Timeout:
-            logging.error('Confidant request timed out.')
-            return ret
-        if not self._check_response_code(response, expected=[200, 404]):
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
             return ret
         if response.status_code == 404:
             logging.debug('Blind credential not found in confidant.')
@@ -448,6 +436,236 @@ class ConfidantClient(object):
             ).decode('ascii')
         return data_keys, _credential_pairs
 
+    def revert_credential(
+            self,
+            id,
+            revision=None
+            ):
+        """Reverts a credential to a previous revision.
+
+        Args:
+            id: The ID of the credential.
+            revision: The revision number to revert to, or None to revert to
+                the immediately previous revision.
+        """
+        # Return a dict, always with an attribute that specifies whether or not
+        # the function was able to successfully get a result.
+        ret = {'result': False}
+        # Find the current revision
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/credentials/{1}'.format(self.config['url'], id)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        current_cred_revision = response.json()
+        if current_cred_revision['revision'] == 1:
+            logging.error('This credential has no previous revision')
+            return ret
+        if revision:
+            if revision == current_cred_revision['revision']:
+                logging.error('Revision number is the same as current revision')
+                return ret
+        else:
+            # Set revision to the second most recent.
+            revision = current_cred_revision['revision'] - 1
+        logging.info(
+            'Attempting to revert credential to revision {}'.format(revision)
+        )
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/credentials/{1}-{2}'.format(
+                    self.config['url'], id, revision
+                )
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        cred_revision = response.json()
+        if self._identical_fields(
+                current_cred_revision, cred_revision,
+                ['name', 'credential_pairs', 'metadata', 'enabled']):
+            logging.error(
+                'Cannot revert to revision {}. No difference between '
+                'it and current revision.'.format(revision))
+            return ret
+        try:
+            response = self._execute_request(
+                'put',
+                '{0}/v1/credentials/{1}'.format(self.config['url'], id),
+                headers=JSON_HEADERS,
+                data=json.dumps(cred_revision)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        try:
+            data = response.json()
+        except ValueError:
+            logging.error('Received badly formatted json data from confidant.')
+            return ret
+        ret['credential'] = data
+        ret['result'] = True
+        return ret
+
+    def revert_service(
+            self,
+            id,
+            revision=None
+            ):
+        """Reverts a service to a previous revision.
+
+        Args:
+            id: The ID of the service.
+            revision: The revision number to revert to, or None to revert to
+                the immediately previous revision.
+        """
+        # Return a dict, always with an attribute that specifies whether or not
+        # the function was able to successfully get a result.
+        ret = {'result': False}
+        # Find the current revision
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/archive/services/{1}'.format(self.config['url'], id)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        service_revisions = response.json()['revisions']
+        current_service_revision = service_revisions[0]
+        if current_service_revision['revision'] == 1:
+            logging.error('This service has no previous revision')
+            return ret
+        if revision:
+            if revision == current_service_revision['revision']:
+                logging.error('Revision number is the same as current revision')
+                return ret
+        else:
+            # Set revision to the second most recent.
+            revision = current_service_revision['revision'] - 1
+        logging.info(
+            'Attempting to revert service to revision {}'.format(revision)
+        )
+        service_revision = None
+        for r in service_revisions:
+            if r['revision'] == revision:
+                service_revision = r
+                break
+        if not service_revision:
+            logging.error('Cannot find revision {}'.format(revision))
+            return ret
+        if self._identical_fields(
+                current_service_revision, service_revision,
+                ['credentials', 'blind_credentials', 'enabled']):
+            logging.error(
+                'Cannot revert to revision {}. No difference between '
+                'it and current revision.'.format(revision))
+            return ret
+        try:
+            response = self._execute_request(
+                'put',
+                '{0}/v1/services/{1}'.format(self.config['url'], id),
+                headers=JSON_HEADERS,
+                data=json.dumps(service_revision)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        try:
+            data = response.json()
+        except ValueError:
+            logging.error('Received badly formatted json data from confidant.')
+            return ret
+        ret['service'] = data
+        ret['result'] = True
+        return ret
+
+    def revert_blind_credential(
+            self,
+            id,
+            revision=None
+            ):
+        """Reverts a blind credential to a previous revision.
+
+        Args:
+            id: The ID of the blind credential.
+            revision: The revision number to revert to, or None to revert to
+                the immediately previous revision.
+        """
+        # Return a dict, always with an attribute that specifies whether or not
+        # the function was able to successfully get a result.
+        ret = {'result': False}
+        # Find the current revision
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        current_cred_revision = response.json()
+        if current_cred_revision['revision'] == 1:
+            logging.error('This blind credential has no previous revision')
+            return ret
+        if revision:
+            if revision == current_cred_revision['revision']:
+                logging.error('Revision number is the same as current revision')
+                return ret
+        else:
+            # Set revision to the second most recent.
+            revision = current_cred_revision['revision'] - 1
+        logging.info(
+            'Attempting to revert credential to revision {}'.format(revision)
+        )
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/blind_credentials/{1}-{2}'.format(
+                    self.config['url'], id, revision
+                )
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        cred_revision = response.json()
+        if self._identical_fields(
+                current_cred_revision, cred_revision,
+                ['name', 'credential_keys', 'credential_pairs', 'metadata',
+                 'enabled']):
+            logging.error(
+                'Cannot revert to revision {}. No difference between '
+                'it and current revision.'.format(revision))
+            return ret
+        try:
+            response = self._execute_request(
+                'put',
+                '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id),
+                headers=JSON_HEADERS,
+                data=json.dumps(cred_revision)
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        try:
+            data = response.json()
+        except ValueError:
+            logging.error('Received badly formatted json data from confidant.')
+            return ret
+        ret['blind_credential'] = data
+        ret['result'] = True
+        return ret
+
+    def _identical_fields(self, a, b, fields):
+        for field in fields:
+            if a.get(field) != b.get(field):
+                return False
+        return True
+
     def create_blind_credential(
             self,
             blind_keys,
@@ -488,21 +706,15 @@ class ConfidantClient(object):
         if store_keys:
             data['credential_keys'] = list(credential_pairs.keys())
         try:
-            response = self.request_session.post(
+            response = self._execute_request(
+                'post',
                 '{0}/v1/blind_credentials'.format(self.config['url']),
-                auth=(self._get_username(), self._get_token()),
+                timeout=5,
                 headers=JSON_HEADERS,
                 data=json.dumps(data),
-                allow_redirects=False,
-                timeout=5
             )
-        except requests.ConnectionError:
-            logging.error('Failed to connect to confidant.')
-            return ret
-        except requests.Timeout:
-            logging.error('Confidant request timed out.')
-            return ret
-        if not self._check_response_code(response):
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
             return ret
         try:
             data = response.json()
@@ -573,21 +785,15 @@ class ConfidantClient(object):
         if enabled is not None:
             data['enabled'] = enabled
         try:
-            response = self.request_session.put(
+            response = self._execute_request(
+                'put',
                 '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id),
-                auth=(self._get_username(), self._get_token()),
+                timeout=5,
                 headers=JSON_HEADERS,
-                data=json.dumps(data),
-                allow_redirects=False,
-                timeout=5
+                data=json.dumps(data)
             )
-        except requests.ConnectionError:
-            logging.error('Failed to connect to confidant.')
-            return ret
-        except requests.Timeout:
-            logging.error('Confidant request timed out.')
-            return ret
-        if not self._check_response_code(response):
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
             return ret
         try:
             data = response.json()
@@ -603,23 +809,16 @@ class ConfidantClient(object):
         # Return a dict, always with an attribute that specifies whether or not
         # the function was able to successfully get a result.
         ret = {'result': False}
+        # Make a request to confidant with the provided url, to fetch the
+        # service providing the service name and base64 encoded
+        # token for authentication.
         try:
-            # Make a request to confidant with the provided url, to fetch the
-            # service providing the service name and base64 encoded
-            # token for authentication.
-            response = self.request_session.get(
-                '{0}/v1/blind_credentials'.format(self.config['url']),
-                auth=(self._get_username(), self._get_token()),
-                allow_redirects=False,
-                timeout=2
+            response = self._execute_request(
+                'get',
+                '{0}/v1/blind_credentials'.format(self.config['url'])
             )
-        except requests.ConnectionError:
-            logging.error('Failed to connect to confidant.')
-            return ret
-        except requests.Timeout:
-            logging.error('Confidant request timed out.')
-            return ret
-        if not self._check_response_code(response, expected=[200]):
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
             return ret
         try:
             data = response.json()
@@ -629,6 +828,50 @@ class ConfidantClient(object):
         ret['blind_credentials'] = data['blind_credentials']
         ret['result'] = True
         return ret
+
+    def _execute_request(
+            self,
+            method,
+            url,
+            expected_return_codes=[200],
+            timeout=2,
+            **kwargs
+            ):
+        try:
+            if method == 'get':
+                response = self.request_session.get(
+                    url,
+                    auth=(self._get_username(), self._get_token()),
+                    allow_redirects=False,
+                    timeout=timeout,
+                    **kwargs
+                )
+            elif method == 'post':
+                response = self.request_session.post(
+                    url,
+                    auth=(self._get_username(), self._get_token()),
+                    allow_redirects=False,
+                    timeout=timeout,
+                    **kwargs
+                )
+            elif method == 'put':
+                response = self.request_session.put(
+                    url,
+                    auth=(self._get_username(), self._get_token()),
+                    allow_redirects=False,
+                    timeout=timeout,
+                    **kwargs
+                )
+            else:
+                raise ValueError('Unexpected method: {}'.format(method))
+        except requests.ConnectionError:
+            raise RequestExecutionError('Failed to connect to confidant.')
+        except requests.Timeout:
+            raise RequestExecutionError('Confidant request timed out.')
+        if not self._check_response_code(
+                response, expected=expected_return_codes):
+            raise RequestExecutionError('Unexpected return code')
+        return response
 
 
 class TokenCreationError(Exception):
@@ -642,4 +885,10 @@ class ClientConfigurationError(Exception):
 
     """An exception raised when the client has been invalidly configured."""
 
+    pass
+
+
+class RequestExecutionError(Exception):
+
+    """An exception raised when a request to Confidant failed."""
     pass

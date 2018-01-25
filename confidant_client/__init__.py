@@ -171,7 +171,8 @@ class ConfidantClient(object):
             )
         except kmsauth.ConfigurationError as e:
             kms_msg = str(e)
-            raise ClientConfigurationError('Error configuring kmsauth client: %s' % kms_msg)
+            raise ClientConfigurationError('Error configuring kmsauth client: '
+                                           + kms_msg)
 
     def _load_config(self, config_files, profile):
         """Initialize client settings from config."""

@@ -24,8 +24,8 @@ def bash_export_format(data, default_prefix):
     if not service:
         return ret
 
-    credentials_metadata = service.get('credentials_metadata', {})
     metadata_by_key = {}
+    credentials_metadata = service.get('credentials_metadata', {})
     for credential in credentials_metadata.get('credentials', []):
         key = credential.pop('id')
         if not _valid_key(key):

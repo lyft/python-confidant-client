@@ -18,11 +18,20 @@ import confidant_client
 KEY_BAD_PATTERN = re.compile(r'(\W|^\d)')
 
 
-def bash_export_format(data, prefix):
+def bash_export_format(data, default_prefix):
     ret = ''
     service = data.get('service', {})
     if not service:
         return ret
+
+    metadata_by_key = {}
+    credentials_metadata = service.get('credentials_metadata', {})
+    for credential in credentials_metadata.get('credentials', []):
+        key = credential.pop('id')
+        if not _valid_key(key):
+            continue
+        metadata_by_key[key] = credential
+
     credentials = service.get('credentials', [])
     blind_credentials = service.get('blind_credentials', [])
     for cred in credentials:
@@ -30,6 +39,9 @@ def bash_export_format(data, prefix):
         for key, val in six.iteritems(pairs):
             if not _valid_key(key):
                 continue
+            metadata = metadata_by_key.get(key, {})
+            prefix = metadata.get('env_var_prefix') or default_prefix
+
             var = ': ${{{0}{1}={2}}}\n'.format(
                 prefix.upper(),
                 key.upper(),
@@ -49,6 +61,9 @@ def bash_export_format(data, prefix):
         for key, val in six.iteritems(pairs):
             if not _valid_key(key):
                 continue
+            metadata = metadata_by_key.get(key, {})
+            prefix = metadata.get('env_var_prefix', default_prefix)
+
             var = ': ${{{0}{1}={2}}}\n'.format(
                 prefix.upper(),
                 key.upper(),

@@ -1,3 +1,11 @@
+## 1.5.1
+
+* support custom environment variable prefixes
+
+## 1.5.0
+
+* add credential revert functionality
+
 ## 1.4.0
 
 * python3 compat

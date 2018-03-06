@@ -1,3 +1,7 @@
+## 1.5.2
+
+* fixup for release tag
+
 ## 1.5.1
 
 * support custom environment variable prefixes

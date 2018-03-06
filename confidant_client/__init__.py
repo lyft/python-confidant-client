@@ -28,7 +28,7 @@ logging.getLogger('urllib3').setLevel(logging.WARNING)
 boto3.set_stream_logger(level=logging.WARNING)
 logging.getLogger('botocore').setLevel(logging.WARNING)
 
-VERSION = '1.5.1'
+VERSION = '1.5.2'
 JSON_HEADERS = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 TOKEN_SKEW = 3
 TIME_FORMAT = "%Y%m%dT%H%M%SZ"

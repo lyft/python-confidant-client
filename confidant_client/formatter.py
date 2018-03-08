@@ -78,7 +78,7 @@ def combined_credential_pair_format(data):
     metadata_namespace = 'credentials_metadata'
     ret = {}
     credential_pairs = {}
-    credential_metadata = []
+    credentials_metadata = []
     service = data.get('service', {})
     credentials = service.get('credentials', [])
     blind_credentials = service.get('blind_credentials', [])
@@ -90,11 +90,14 @@ def combined_credential_pair_format(data):
                     msg.format(credential['name'], credential['id'])
                 )
         credential_pairs.update(credential['credential_pairs'])
-        credential_metadata.append({
+        credential_metadata = {
             'id': credential['id'],
             'revision': credential['revision'],
             'name': credential['name']
-        })
+        }
+        if credential.get('metadata'):
+            credential_metadata['metadata'] = credential['metadata']
+        credentials_metadata.append(credential_metadata)
     for credential in blind_credentials:
         for key, val in credential['decrypted_credential_pairs'].items():
             if key in credential_pairs:
@@ -104,15 +107,18 @@ def combined_credential_pair_format(data):
                     msg.format(credential['name'], credential['id'])
                 )
         credential_pairs.update(credential['decrypted_credential_pairs'])
-        credential_metadata.append({
+        credential_metadata = {
             'id': credential['id'],
             'revision': credential['revision'],
             'name': credential['name']
-        })
+        }
+        if credential.get('metadata'):
+            credential_metadata['metadata'] = credential['metadata']
+        credentials_metadata.append(credential_metadata)
     ret[namespace] = credential_pairs
     ret[metadata_namespace] = {
         'revision': service.get('revision'),
-        'credentials': credential_metadata
+        'credentials': credentials_metadata
     }
     return ret
 

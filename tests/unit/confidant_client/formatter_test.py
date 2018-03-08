@@ -7,31 +7,29 @@ import confidant_client.formatter as formatter
 
 def credentials_data_fixture(credential_pairs=None, credentials_metadata=None):
     return {
-      "service" : {
-          "modified_date" : "Thu, 1 Jan 1970 00:00:00 GMT",
-          "id" : "example-service-id",
-          "modified_by" : "james@lyft.com",
-          "credentials" : [
-          {
-            "metadata" : credentials_metadata or {},
-            "credential_pairs" : credential_pairs or {
-               "testkey" : "testval",
-               "testkey2" : "testval2"
-            },
-            "id" : "example-credential-id",
-            "revision" : 2,
-            "documentation" : None,
-            "enabled" : True,
-            "name" : "example-credential-name",
-            "data_type" : "credential"
-          }
-        ],
-        "account" : None,
-        "revision" : 2,
-        "enabled" : True,
-        "blind_credentials" : []
-      },
-      "result" : True
+        "service": {
+            "modified_date": "Thu, 1 Jan 1970 00:00:00 GMT",
+            "id": "example-service-id",
+            "modified_by": "james@lyft.com",
+            "credentials": [{
+                "id": "example-credential-id",
+                "name": "example-credential-name",
+                "data_type": "credential",
+                "revision": 2,
+                "credential_pairs": credential_pairs or {
+                    "testkey": "testval",
+                    "testkey2": "testval2"
+                },
+                "metadata": credentials_metadata or {},
+                "documentation": None,
+                "enabled": True,
+            }],
+            "account": None,
+            "revision": 2,
+            "enabled": True,
+            "blind_credentials": []
+        },
+        "result": True
     }
 
 

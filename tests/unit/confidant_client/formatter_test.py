@@ -66,3 +66,29 @@ class FormatterTest(unittest.TestCase):
 
         self.assertIn(expected_assignment, exports)
         self.assertIn(expected_export, exports)
+
+    def test_combined_pair_format(self):
+        data = credentials_data_fixture()
+
+        result = formatter.combined_credential_pair_format(data)
+
+        self.assertIn('credentials', result)
+        self.assertIn('credentials_metadata', result)
+
+        for credential in result['credentials_metadata']['credentials']:
+            self.assertNotIn('metadata', credential)
+
+    def test_combined_pair_format_with_metadata(self):
+        metadata = {
+            'env_var_prefix': 'override_'
+        }
+        data = credentials_data_fixture(credentials_metadata=metadata)
+
+        result = formatter.combined_credential_pair_format(data)
+
+        self.assertIn('credentials', result)
+        self.assertIn('credentials_metadata', result)
+
+        for credential in result['credentials_metadata']['credentials']:
+            self.assertIn('metadata', credential)
+            self.assertIn('env_var_prefix', credential['metadata'])

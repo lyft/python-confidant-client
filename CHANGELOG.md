@@ -1,3 +1,7 @@
+## 1.5.4
+
+* export metadata in 'combined' output format
+
 ## 1.5.3
 
 * update metadata response format handling

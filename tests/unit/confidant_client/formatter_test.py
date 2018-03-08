@@ -6,30 +6,30 @@ import confidant_client.formatter as formatter
 
 
 def credentials_data_fixture(credential_pairs=None, credentials_metadata=None):
-    credential_pairs = credential_pairs or {
-        'testkey': 'testval',
-        'test2key': 'test2val',
-    }
-    credentials_metadata = credentials_metadata or {
-        'credentials': [
-            {
-                'id': 'efc58f0b9d2b4961a18f045b53962516',
-                'name': 'test',
-                'revision': 1
-            },
-            {
-                'id': 'cbec355a86c346c19f0bf905e87c8cd3',
-                'name': 'test2',
-                'revision': 1
-            },
-        ]
-    }
-
     return {
-        'service': {
-            'credentials': [{'credential_pairs': credential_pairs}],
-            'credentials_metadata': credentials_metadata,
-        }
+        "service": {
+            "modified_date": "Thu, 1 Jan 1970 00:00:00 GMT",
+            "id": "example-service-id",
+            "modified_by": "james@lyft.com",
+            "credentials": [{
+                "id": "example-credential-id",
+                "name": "example-credential-name",
+                "data_type": "credential",
+                "revision": 2,
+                "credential_pairs": credential_pairs or {
+                    "testkey": "testval",
+                    "testkey2": "testval2"
+                },
+                "metadata": credentials_metadata or {},
+                "documentation": None,
+                "enabled": True,
+            }],
+            "account": None,
+            "revision": 2,
+            "enabled": True,
+            "blind_credentials": []
+        },
+        "result": True
     }
 
 
@@ -52,14 +52,7 @@ class FormatterTest(unittest.TestCase):
 
     def test_export_var_prefix_override(self):
         metadata = {
-            'credentials': [
-                {
-                    'id': 'testkey',
-                    'name': 'test',
-                    'revision': 1,
-                    'env_var_prefix': 'override_'
-                }
-            ]
+            'env_var_prefix': 'override_'
         }
         data = credentials_data_fixture(credentials_metadata=metadata)
         default_prefix = 'test_prefix_'

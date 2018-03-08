@@ -10,25 +10,14 @@ def credentials_data_fixture(credential_pairs=None, credentials_metadata=None):
         'testkey': 'testval',
         'test2key': 'test2val',
     }
-    credentials_metadata = credentials_metadata or {
-        'credentials': [
-            {
-                'id': 'efc58f0b9d2b4961a18f045b53962516',
-                'name': 'test',
-                'revision': 1
-            },
-            {
-                'id': 'cbec355a86c346c19f0bf905e87c8cd3',
-                'name': 'test2',
-                'revision': 1
-            },
-        ]
-    }
+    credentials_metadata = credentials_metadata or {}
 
     return {
         'service': {
-            'credentials': [{'credential_pairs': credential_pairs}],
-            'credentials_metadata': credentials_metadata,
+            'credentials': [{
+                'credential_pairs': credential_pairs,
+                'metadata': credentials_metadata,
+            }],
         }
     }
 
@@ -52,14 +41,7 @@ class FormatterTest(unittest.TestCase):
 
     def test_export_var_prefix_override(self):
         metadata = {
-            'credentials': [
-                {
-                    'id': 'testkey',
-                    'name': 'test',
-                    'revision': 1,
-                    'env_var_prefix': 'override_'
-                }
-            ]
+            'env_var_prefix': 'override_'
         }
         data = credentials_data_fixture(credentials_metadata=metadata)
         default_prefix = 'test_prefix_'

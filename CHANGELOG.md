@@ -1,3 +1,7 @@
+## 1.5.3
+
+* update metadata response format handling
+
 ## 1.5.2
 
 * fixup for release tag

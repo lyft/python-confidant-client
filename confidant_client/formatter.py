@@ -76,9 +76,11 @@ def bash_export_format(data, default_prefix):
 def combined_credential_pair_format(data):
     namespace = 'credentials'
     metadata_namespace = 'credentials_metadata'
+    source_namespace = 'credentials_source'
     ret = {}
     credential_pairs = {}
     credentials_metadata = []
+    credentials_source = {}
     service = data.get('service', {})
     credentials = service.get('credentials', [])
     blind_credentials = service.get('blind_credentials', [])
@@ -89,6 +91,7 @@ def combined_credential_pair_format(data):
                 logging.warning(
                     msg.format(credential['name'], credential['id'])
                 )
+            credentials_source[key] = credential['id']
         credential_pairs.update(credential['credential_pairs'])
         credential_metadata = {
             'id': credential['id'],
@@ -106,6 +109,7 @@ def combined_credential_pair_format(data):
                 logging.warning(
                     msg.format(credential['name'], credential['id'])
                 )
+            credentials_source[key] = credential['id']
         credential_pairs.update(credential['decrypted_credential_pairs'])
         credential_metadata = {
             'id': credential['id'],
@@ -120,6 +124,7 @@ def combined_credential_pair_format(data):
         'revision': service.get('revision'),
         'credentials': credentials_metadata
     }
+    ret[source_namespace] = credentials_source
     return ret
 
 

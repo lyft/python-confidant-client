@@ -88,7 +88,13 @@ class FormatterTest(unittest.TestCase):
 
         self.assertIn('credentials', result)
         self.assertIn('credentials_metadata', result)
+        self.assertIn('credentials_source', result)
 
         for credential in result['credentials_metadata']['credentials']:
             self.assertIn('metadata', credential)
             self.assertIn('env_var_prefix', credential['metadata'])
+
+            for key, value in six.iteritems(result['credentials']):
+                id_from_credential = credential['id']
+                id_from_source = result['credentials_source'][key]
+                self.assertEqual(id_from_credential, id_from_source)

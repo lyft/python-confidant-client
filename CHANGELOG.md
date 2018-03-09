@@ -1,3 +1,7 @@
+## 1.5.5
+
+* add credential pair to credential id mapping
+
 ## 1.5.4
 
 * export metadata in 'combined' output format

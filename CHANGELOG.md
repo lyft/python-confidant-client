@@ -1,3 +1,8 @@
+## 1.6.0
+
+* Require newer boto3 and remove pyopenssl workaround
+* Only depend on pyopenssl, ndg-httpsclient, pyasn1 in python2.7
+
 ## 1.5.5
 
 * add credential pair to credential id mapping

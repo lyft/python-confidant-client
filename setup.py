@@ -22,7 +22,7 @@ requirements = [
     # License: Apache2
     # Upstream url: https://github.com/boto/boto3
     # Use: For KMS
-    'boto3>=1.2.0,<2.0.0',
+    'boto3>=1.2.6,<2.0.0',
 
     # cryptography is a package which provides cryptographic recipes and
     # primitives to Python developers.

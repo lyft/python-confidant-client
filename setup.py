@@ -16,73 +16,75 @@ from __future__ import absolute_import
 from setuptools import setup, find_packages
 
 
-requirements = [
-    # Boto3 is the Amazon Web Services (AWS) Software Development Kit (SDK)
-    # for Python.
-    # License: Apache2
-    # Upstream url: https://github.com/boto/boto3
-    # Use: For KMS
-    'boto3>=1.2.6,<2.0.0',
-
-    # cryptography is a package which provides cryptographic recipes and
-    # primitives to Python developers.
-    # License: BSD
-    # Upstream url: https://github.com/pyca/cryptography
-    # Use: For encryption
-    'cryptography>=1.2.1,<3.0.0',
-
-    # Python HTTP for Humans.
-    # License: Apache2
-    # Upstream url: http://python-requests.org
-    # Use: REST calls to external services
-    'requests>=2.9.1,<3.0.0',
-
-    # A python library for reusing KMS for your own authentication and
-    # authorization.
-    # Licence: Apache2
-    # Upstream url: https://github.com/lyft/python-kmsauth
-    # Use: client authentication to confidant
-    'kmsauth>=0.3.0,<1.0.0',
-
-    # Provides enhanced HTTPS support for httplib and urllib2 using PyOpenSSL
-    # License: BSD
-    # Upstream url: https://github.com/cedadev/ndg_httpsclient/
-    # Use: Securing requests for python < 2.7.9.
-    'ndg-httpsclient>=0.4.0,<1.0.0',
-
-    # ASN.1 types and codecs
-    # License: BSD
-    # Upstream url: http://sourceforge.net/projects/pyasn1/
-    # Use: Securing requests for python < 2.7.9.
-    'pyasn1>=0.1.9,<1.0.0',
-
-    # Python wrapper module around the OpenSSL library
-    # License: APL2
-    # Upstream url: https://github.com/pyca/pyopenssl
-    # Use: Securing requests for python < 2.7.9.
-    'pyOpenSSL>=0.15.1,<18.0.0',
-
-    # License: MIT
-    # Upstream url: http://pyyaml.org/wiki/PyYAML
-    # Use: For parsing users.yaml
-    'PyYAML>=3.11',
-
-    # License: BSD
-    # Upstream url: http://jinja.pocoo.org/
-    # Use: For generating templated output files from Confidant secrets
-    'jinja2>=2.8',
-
-    # License: MIT
-    # Upstream url: https://github.com/benjaminp/six
-    # Use: Python 2/3 compatiability
-    'six>=1.10.0',
-]
-
 setup(
     name="confidant-client",
     version="1.5.5",
     packages=find_packages(exclude=["test*"]),
-    install_requires=requirements,
+    install_requires=[
+        # Boto3 is the Amazon Web Services (AWS) Software Development Kit (SDK)
+        # for Python.
+        # License: Apache2
+        # Upstream url: https://github.com/boto/boto3
+        # Use: For KMS
+        'boto3>=1.2.6,<2.0.0',
+
+        # cryptography is a package which provides cryptographic recipes and
+        # primitives to Python developers.
+        # License: BSD
+        # Upstream url: https://github.com/pyca/cryptography
+        # Use: For encryption
+        'cryptography>=1.2.1,<3.0.0',
+
+        # Python HTTP for Humans.
+        # License: Apache2
+        # Upstream url: http://python-requests.org
+        # Use: REST calls to external services
+        'requests>=2.9.1,<3.0.0',
+
+        # A python library for reusing KMS for your own authentication and
+        # authorization.
+        # Licence: Apache2
+        # Upstream url: https://github.com/lyft/python-kmsauth
+        # Use: client authentication to confidant
+        'kmsauth>=0.3.0,<1.0.0',
+
+        # License: MIT
+        # Upstream url: http://pyyaml.org/wiki/PyYAML
+        # Use: For parsing users.yaml
+        'PyYAML>=3.11',
+
+        # License: BSD
+        # Upstream url: http://jinja.pocoo.org/
+        # Use: For generating templated output files from Confidant secrets
+        'jinja2>=2.8',
+
+        # License: MIT
+        # Upstream url: https://github.com/benjaminp/six
+        # Use: Python 2/3 compatiability
+        'six>=1.10.0',
+    ],
+    extras_require={
+        ':python_version=="2.7"': [
+            # Provides enhanced HTTPS support for httplib and urllib2 using
+            # PyOpenSSL
+            # License: BSD
+            # Upstream url: https://github.com/cedadev/ndg_httpsclient/
+            # Use: Securing requests for python < 2.7.9.
+            'ndg-httpsclient>=0.4.0,<1.0.0',
+
+            # ASN.1 types and codecs
+            # License: BSD
+            # Upstream url: http://sourceforge.net/projects/pyasn1/
+            # Use: Securing requests for python < 2.7.9.
+            'pyasn1>=0.1.9,<1.0.0',
+
+            # Python wrapper module around the OpenSSL library
+            # License: APL2
+            # Upstream url: https://github.com/pyca/pyopenssl
+            # Use: Securing requests for python < 2.7.9.
+            'pyOpenSSL>=0.15.1,<18.0.0',
+        ],
+    },
     author="Ryan Lane",
     author_email="rlane@lyft.com",
     description="A client for confidant, a secret management system.",

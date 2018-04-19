@@ -16,7 +16,6 @@ from cryptography.fernet import Fernet
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util import Retry
 
-import confidant_client.workarounds  # noqa
 import confidant_client.services
 from confidant_client.lib import cryptolib
 

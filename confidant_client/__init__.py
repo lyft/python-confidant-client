@@ -59,7 +59,8 @@ class ConfidantClient(object):
             retries=None,
             backoff=None,
             config_files=None,
-            profile=None
+            profile=None,
+            verify=None
             ):
         """Create a ConfidantClient object.
 
@@ -87,6 +88,7 @@ class ConfidantClient(object):
             configuration from. First file found will be used. Default:
                 ['~/.confidant', '/etc/confidant/config']
             profile: profile to read config values from.
+            verify:  Whether we verify the server’s TLS certificate.
         """
         # Set defaults
         self.config = {
@@ -99,7 +101,8 @@ class ConfidantClient(object):
             'assume_role': None,
             'region': None,
             'retries': 0,
-            'backoff': 1
+            'backoff': 1,
+            'verify': True
         }
         if config_files is None:
             config_files = ['~/.confidant', '/etc/confidant/config']
@@ -117,13 +120,15 @@ class ConfidantClient(object):
             'token_cache_file': token_cache_file,
             'region': region,
             'backoff': backoff,
-            'assume_role': assume_role
+            'assume_role': assume_role,
+            'verify': verify
         }
         for key, val in args_config.items():
             if val is not None:
                 self.config[key] = val
         # Use session to re-try failed requests.
         self.request_session = requests.Session()
+        self.request_session.verify = self.config['verify']
         for proto in ['http://', 'https://']:
             self.request_session.mount(
                 proto,

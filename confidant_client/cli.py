@@ -45,7 +45,8 @@ def _get_client_from_args(args):
         region=args.region,
         retries=args.retries,
         config_files=config_files,
-        profile=args.profile
+        profile=args.profile,
+        verify=args.verify
     )
     return client
 
@@ -77,6 +78,14 @@ def _parse_args():
         '--url',
         help=('url of the confidant server. i.e.'
               ' https://confidant-production.example.com')
+    )
+    parser.add_argument(
+        '-v',
+        '--verify-ssl',
+        help='Wether to verify the TLS certificate or not',
+        action='store_true',
+        dest='verify',
+        default=True
     )
     parser.add_argument(
         '--retries',

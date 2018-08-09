@@ -1,3 +1,7 @@
+## 1.7.0
+
+* Add a configuration option for being able to disable ssl cert validation.
+
 ## 1.6.0
 
 * Require newer boto3 and remove pyopenssl workaround

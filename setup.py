@@ -18,7 +18,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="confidant-client",
-    version="1.6.0",
+    version="1.7.0",
     packages=find_packages(exclude=["test*"]),
     install_requires=[
         # Boto3 is the Amazon Web Services (AWS) Software Development Kit (SDK)

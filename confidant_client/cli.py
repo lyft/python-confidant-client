@@ -82,7 +82,7 @@ def _parse_args():
     parser.add_argument(
         '-v',
         '--verify-ssl',
-        help='Wether to verify the TLS certificate or not',
+        help='Whether we verify the servers TLS certificate',
         action='store_true',
         dest='verify',
         default=True

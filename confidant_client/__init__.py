@@ -88,7 +88,7 @@ class ConfidantClient(object):
             configuration from. First file found will be used. Default:
                 ['~/.confidant', '/etc/confidant/config']
             profile: profile to read config values from.
-            verify:  Whether we verify the server’s TLS certificate.
+            verify:  Whether we verify the servers TLS certificate.
         """
         # Set defaults
         self.config = {

@@ -82,7 +82,7 @@ setup(
             # License: APL2
             # Upstream url: https://github.com/pyca/pyopenssl
             # Use: Securing requests for python < 2.7.9.
-            'pyOpenSSL>=0.15.1,<18.0.0',
+            'pyOpenSSL>=0.15.1,<19.0.0',
         ],
     },
     author="Ryan Lane",

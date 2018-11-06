@@ -18,7 +18,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="confidant-client",
-    version="1.7.0",
+    version="1.7.1",
     packages=find_packages(exclude=["test*"]),
     install_requires=[
         # Boto3 is the Amazon Web Services (AWS) Software Development Kit (SDK)
@@ -82,7 +82,7 @@ setup(
             # License: APL2
             # Upstream url: https://github.com/pyca/pyopenssl
             # Use: Securing requests for python < 2.7.9.
-            'pyOpenSSL>=0.15.1,<18.0.0',
+            'pyOpenSSL>=0.15.1,<19.0.0',
         ],
     },
     author="Ryan Lane",

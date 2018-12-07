@@ -89,7 +89,7 @@ setup(
     author_email="rlane@lyft.com",
     description="A client for confidant, a secret management system.",
     license="apache2",
-    url="https://github.com/lyft/confidant-client",
+    url="https://github.com/lyft/python-confidant-client",
     entry_points={
         "console_scripts": [
             "confidant = confidant_client.cli:main",

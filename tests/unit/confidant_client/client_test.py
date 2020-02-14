@@ -26,16 +26,22 @@ class FakeResponse(object):
 
 def request_200(method, url, *args, **kwargs):
     return FakeResponse(url, 200, '{}')
+
+
 mock_200 = mock.Mock(wraps=request_200)
 
 
 def request_404(method, url, *args, **kwargs):
     return FakeResponse(url, 404, '')
+
+
 mock_404 = mock.Mock(wraps=request_404)
 
 
 def request_500(method, url, *args, **kwargs):
     return FakeResponse(url, 500, '')
+
+
 mock_500 = mock.Mock(wraps=request_500)
 
 

@@ -8,11 +8,6 @@ flake8==2.3.0
 # Upstream url: https://pypi.python.org/pypi/coverage
 coverage==3.7.1
 
-# tool to check your Python code against some of the style conventions
-# License: Expat License
-# Upstream url: https://github.com/jcrocholl/pep8.git
-pep8==1.5.7
-
 # nose makes testing easier
 # License: GNU Library or Lesser General Public License (LGPL)
 # Upstream url: http://readthedocs.org/docs/nose

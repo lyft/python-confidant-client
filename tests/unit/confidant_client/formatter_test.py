@@ -2,7 +2,7 @@ from __future__ import absolute_import
 import six
 import unittest
 
-import confidant_client.formatter as formatter
+from confidant_client import formatter
 
 
 def credentials_data_fixture(credential_pairs=None, credentials_metadata=None):

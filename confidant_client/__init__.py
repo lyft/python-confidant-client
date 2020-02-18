@@ -732,7 +732,7 @@ class ConfidantClient(object):
         try:
             response = self._execute_request(
                 'get',
-                '{0}/v1/certificate/{1}/{2}?validity={3}{4}'.format(
+                '{0}/v1/certificates/{1}/{2}?validity={3}{4}'.format(
                     self.config['url'],
                     ca,
                     cn,
@@ -762,7 +762,7 @@ class ConfidantClient(object):
         try:
             response = self._execute_request(
                 'post',
-                '{0}/v1/certificate/{1}'.format(
+                '{0}/v1/certificates/{1}'.format(
                     self.config['url'],
                     ca,
                     data={

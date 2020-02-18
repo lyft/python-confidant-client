@@ -27,7 +27,7 @@ logging.getLogger('urllib3').setLevel(logging.WARNING)
 boto3.set_stream_logger(level=logging.WARNING)
 logging.getLogger('botocore').setLevel(logging.WARNING)
 
-VERSION = '1.5.5'
+VERSION = '2.0.0'
 JSON_HEADERS = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 TOKEN_SKEW = 3
 TIME_FORMAT = "%Y%m%dT%H%M%SZ"
@@ -455,53 +455,18 @@ class ConfidantClient(object):
         # Return a dict, always with an attribute that specifies whether or not
         # the function was able to successfully get a result.
         ret = {'result': False}
-        # Find the current revision
-        try:
-            response = self._execute_request(
-                'get',
-                '{0}/v1/credentials/{1}'.format(self.config['url'], id)
-            )
-        except RequestExecutionError:
-            logging.exception('Error with executing request')
-            return ret
-        current_cred_revision = response.json()
-        if current_cred_revision['revision'] == 1:
-            logging.error('This credential has no previous revision')
-            return ret
-        if revision:
-            if revision == current_cred_revision['revision']:
-                logging.error('Revision number is the same as current revision')
-                return ret
-        else:
-            # Set revision to the second most recent.
-            revision = current_cred_revision['revision'] - 1
         logging.info(
             'Attempting to revert credential to revision {}'.format(revision)
         )
         try:
             response = self._execute_request(
-                'get',
-                '{0}/v1/credentials/{1}-{2}'.format(
-                    self.config['url'], id, revision
-                )
-            )
-        except RequestExecutionError:
-            logging.exception('Error with executing request')
-            return ret
-        cred_revision = response.json()
-        if self._identical_fields(
-                current_cred_revision, cred_revision,
-                ['name', 'credential_pairs', 'metadata', 'enabled']):
-            logging.error(
-                'Cannot revert to revision {}. No difference between '
-                'it and current revision.'.format(revision))
-            return ret
-        try:
-            response = self._execute_request(
                 'put',
-                '{0}/v1/credentials/{1}'.format(self.config['url'], id),
+                '{0}/v1/credentials/{1}/{2}'.format(
+                    self.config['url'],
+                    id,
+                    revision,
+                ),
                 headers=JSON_HEADERS,
-                data=json.dumps(cred_revision)
             )
         except RequestExecutionError:
             logging.exception('Error with executing request')
@@ -530,51 +495,15 @@ class ConfidantClient(object):
         # Return a dict, always with an attribute that specifies whether or not
         # the function was able to successfully get a result.
         ret = {'result': False}
-        # Find the current revision
-        try:
-            response = self._execute_request(
-                'get',
-                '{0}/v1/archive/services/{1}'.format(self.config['url'], id)
-            )
-        except RequestExecutionError:
-            logging.exception('Error with executing request')
-            return ret
-        service_revisions = response.json()['revisions']
-        current_service_revision = service_revisions[0]
-        if current_service_revision['revision'] == 1:
-            logging.error('This service has no previous revision')
-            return ret
-        if revision:
-            if revision == current_service_revision['revision']:
-                logging.error('Revision number is the same as current revision')
-                return ret
-        else:
-            # Set revision to the second most recent.
-            revision = current_service_revision['revision'] - 1
-        logging.info(
-            'Attempting to revert service to revision {}'.format(revision)
-        )
-        service_revision = None
-        for r in service_revisions:
-            if r['revision'] == revision:
-                service_revision = r
-                break
-        if not service_revision:
-            logging.error('Cannot find revision {}'.format(revision))
-            return ret
-        if self._identical_fields(
-                current_service_revision, service_revision,
-                ['credentials', 'blind_credentials', 'enabled']):
-            logging.error(
-                'Cannot revert to revision {}. No difference between '
-                'it and current revision.'.format(revision))
-            return ret
         try:
             response = self._execute_request(
                 'put',
-                '{0}/v1/services/{1}'.format(self.config['url'], id),
+                '{0}/v1/services/{1}/{2}'.format(
+                    self.config['url'],
+                    id,
+                    revision,
+                ),
                 headers=JSON_HEADERS,
-                data=json.dumps(service_revision)
             )
         except RequestExecutionError:
             logging.exception('Error with executing request')
@@ -603,54 +532,15 @@ class ConfidantClient(object):
         # Return a dict, always with an attribute that specifies whether or not
         # the function was able to successfully get a result.
         ret = {'result': False}
-        # Find the current revision
-        try:
-            response = self._execute_request(
-                'get',
-                '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id)
-            )
-        except RequestExecutionError:
-            logging.exception('Error with executing request')
-            return ret
-        current_cred_revision = response.json()
-        if current_cred_revision['revision'] == 1:
-            logging.error('This blind credential has no previous revision')
-            return ret
-        if revision:
-            if revision == current_cred_revision['revision']:
-                logging.error('Revision number is the same as current revision')
-                return ret
-        else:
-            # Set revision to the second most recent.
-            revision = current_cred_revision['revision'] - 1
-        logging.info(
-            'Attempting to revert credential to revision {}'.format(revision)
-        )
-        try:
-            response = self._execute_request(
-                'get',
-                '{0}/v1/blind_credentials/{1}-{2}'.format(
-                    self.config['url'], id, revision
-                )
-            )
-        except RequestExecutionError:
-            logging.exception('Error with executing request')
-            return ret
-        cred_revision = response.json()
-        if self._identical_fields(
-                current_cred_revision, cred_revision,
-                ['name', 'credential_keys', 'credential_pairs', 'metadata',
-                 'enabled']):
-            logging.error(
-                'Cannot revert to revision {}. No difference between '
-                'it and current revision.'.format(revision))
-            return ret
         try:
             response = self._execute_request(
                 'put',
-                '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id),
+                '{0}/v1/blind_credentials/{1}/{2}'.format(
+                    self.config['url'],
+                    id,
+                    revision,
+                ),
                 headers=JSON_HEADERS,
-                data=json.dumps(cred_revision)
             )
         except RequestExecutionError:
             logging.exception('Error with executing request')
@@ -663,12 +553,6 @@ class ConfidantClient(object):
         ret['blind_credential'] = data
         ret['result'] = True
         return ret
-
-    def _identical_fields(self, a, b, fields):
-        for field in fields:
-            if a.get(field) != b.get(field):
-                return False
-        return True
 
     def create_blind_credential(
             self,
@@ -830,6 +714,73 @@ class ConfidantClient(object):
             logging.error('Received badly formatted json data from confidant.')
             return ret
         ret['blind_credentials'] = data['blind_credentials']
+        ret['result'] = True
+        return ret
+
+    def get_certificate(self, ca, cn, san=None, validity=120):
+        """Get a certificate chain and key from the provided CA, issued for
+        the given CN and SAN.
+        """
+        ret = {'result': False}
+        _san = ''
+        if san:
+            if san > 1:
+                _san = '&'.join(['san={}'.format(i) for i in san])
+            else:
+                _san = 'san={}'.format(san[0])
+            _san = '&{}'.format(_san)
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/certificate/{1}/{2}?validity={3}{4}'.format(
+                    self.config['url'],
+                    ca,
+                    cn,
+                    validity,
+                    _san,
+                ),
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        try:
+            data = response.json()
+        except ValueError:
+            logging.error('Received badly formatted json data from confidant.')
+            return ret
+        ret['key'] = data['key']
+        ret['certificate'] = data['certificate']
+        ret['certificate_chain'] = data['certificate_chain']
+        ret['result'] = True
+        return ret
+
+    def get_certificate_from_csr(self, ca, csr, validity=120):
+        """Get a certificate chain from the provided CA, using the provided
+        CSR.
+        """
+        ret = {'result': False}
+        try:
+            response = self._execute_request(
+                'post',
+                '{0}/v1/certificate/{1}'.format(
+                    self.config['url'],
+                    ca,
+                    data={
+                        'csr': csr,
+                        'validity': validity,
+                    }
+                ),
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        try:
+            data = response.json()
+        except ValueError:
+            logging.error('Received badly formatted json data from confidant.')
+            return ret
+        ret['certificate'] = data['certificate']
+        ret['certificate_chain'] = data['certificate_chain']
         ret['result'] = True
         return ret
 

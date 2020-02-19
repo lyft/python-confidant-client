@@ -748,9 +748,7 @@ class ConfidantClient(object):
         except ValueError:
             logging.error('Received badly formatted json data from confidant.')
             return ret
-        ret['key'] = data['key']
-        ret['certificate'] = data['certificate']
-        ret['certificate_chain'] = data['certificate_chain']
+        ret['certificate'] = data
         ret['result'] = True
         return ret
 
@@ -779,8 +777,51 @@ class ConfidantClient(object):
         except ValueError:
             logging.error('Received badly formatted json data from confidant.')
             return ret
-        ret['certificate'] = data['certificate']
-        ret['certificate_chain'] = data['certificate_chain']
+        ret['certificate'] = data
+        ret['result'] = True
+        return ret
+
+    def get_ca(self, ca):
+        """Get the CA certificate, certificate chain, and tag info for the
+        provided CA.
+        """
+        ret = {'result': False}
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/cas/{1}'.format(self.config['url'], ca),
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        try:
+            data = response.json()
+        except ValueError:
+            logging.error('Received badly formatted json data from confidant.')
+            return ret
+        ret['ca'] = data
+        ret['result'] = True
+        return ret
+
+    def list_cas(self):
+        """Get the CA certificate, certificate chain, and tag info for the
+        provided CA.
+        """
+        ret = {'result': False}
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/cas'.format(self.config['url']),
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        try:
+            data = response.json()
+        except ValueError:
+            logging.error('Received badly formatted json data from confidant.')
+            return ret
+        ret['cas'] = data['cas']
         ret['result'] = True
         return ret
 

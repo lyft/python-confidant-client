@@ -444,10 +444,6 @@ def _parse_args():
               ' present in the issued certificate.'),
     )
     ca_get_certificate_parser.add_argument(
-        '--output-dir',
-        help='Directory to output key and certificate chain.',
-    )
-    ca_get_certificate_parser.add_argument(
         '--validity',
         help='The validity of the certificate in number of days from today',
         type=int,
@@ -474,6 +470,18 @@ def _parse_args():
         default=120,
     )
 
+    ca_get_ca_parser = subparsers.add_parser(
+        'get_ca'
+    )
+    ca_get_ca_parser.add_argument(
+        '--ca',
+        required=True,
+        help='The certificate authority to get.',
+    )
+
+    subparsers.add_parser(
+        'list_cas'
+    )
     return parser.parse_args()
 
 
@@ -581,7 +589,6 @@ def main():
                 args.cn,
                 args.san,
                 args.validity,
-                args.output_dir,
             )
         except Exception:
             logging.exception('An unexpected general error occurred.')
@@ -592,6 +599,16 @@ def main():
                 args.csr_file,
                 args.validity,
             )
+        except Exception:
+            logging.exception('An unexpected general error occurred.')
+    elif args.subcommand == 'get_ca':
+        try:
+            ret = client.get_ca(args.ca)
+        except Exception:
+            logging.exception('An unexpected general error occurred.')
+    elif args.subcommand == 'list_cas':
+        try:
+            ret = client.list_cas()
         except Exception:
             logging.exception('An unexpected general error occurred.')
 

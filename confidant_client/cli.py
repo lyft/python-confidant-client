@@ -426,6 +426,62 @@ def _parse_args():
         type=int
     )
 
+    ca_get_certificate_parser = subparsers.add_parser('get_certificate')
+    ca_get_certificate_parser.add_argument(
+        '--ca',
+        required=True,
+        help='The certificate authority to issue a certificate from.',
+    )
+    ca_get_certificate_parser.add_argument(
+        '--cn',
+        help=('A cerftificate signing request (CSR) file to issue a certificate'
+              'from.'),
+    )
+    ca_get_certificate_parser.add_argument(
+        '--san',
+        nargs='+',
+        help=('A list of subject alternative name values that should be'
+              ' present in the issued certificate.'),
+    )
+    ca_get_certificate_parser.add_argument(
+        '--validity',
+        help='The validity of the certificate in number of days from today',
+        type=int,
+        default=120,
+    )
+
+    ca_get_certificate_from_csr_parser = subparsers.add_parser(
+        'get_certificate_from_csr'
+    )
+    ca_get_certificate_from_csr_parser.add_argument(
+        '--ca',
+        required=True,
+        help='The certificate authority to issue a certificate from.',
+    )
+    ca_get_certificate_from_csr_parser.add_argument(
+        '--csr-file',
+        help=('A cerftificate signing request (CSR) file to issue a certificate'
+              'from.'),
+    )
+    ca_get_certificate_from_csr_parser.add_argument(
+        '--validity',
+        help='The validity of the certificate in number of days from today',
+        type=int,
+        default=120,
+    )
+
+    ca_get_ca_parser = subparsers.add_parser(
+        'get_ca'
+    )
+    ca_get_ca_parser.add_argument(
+        '--ca',
+        required=True,
+        help='The certificate authority to get.',
+    )
+
+    subparsers.add_parser(
+        'list_cas'
+    )
     return parser.parse_args()
 
 
@@ -524,6 +580,35 @@ def main():
     elif args.subcommand == 'revert_service':
         try:
             ret = client.revert_service(args._id, args.revision)
+        except Exception:
+            logging.exception('An unexpected general error occurred.')
+    elif args.subcommand == 'get_certificate':
+        try:
+            ret = client.get_certificate(
+                args.ca,
+                args.cn,
+                args.san,
+                args.validity,
+            )
+        except Exception:
+            logging.exception('An unexpected general error occurred.')
+    elif args.subcommand == 'get_certificate_from_csr':
+        try:
+            ret = client.get_certificate_from_csr(
+                args.ca,
+                args.csr_file,
+                args.validity,
+            )
+        except Exception:
+            logging.exception('An unexpected general error occurred.')
+    elif args.subcommand == 'get_ca':
+        try:
+            ret = client.get_ca(args.ca)
+        except Exception:
+            logging.exception('An unexpected general error occurred.')
+    elif args.subcommand == 'list_cas':
+        try:
+            ret = client.list_cas()
         except Exception:
             logging.exception('An unexpected general error occurred.')
 

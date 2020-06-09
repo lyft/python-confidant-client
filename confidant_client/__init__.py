@@ -60,7 +60,8 @@ class ConfidantClient(object):
             backoff=None,
             config_files=None,
             profile=None,
-            verify=None
+            verify=None,
+            timeout=None
             ):
         """Create a ConfidantClient object.
 
@@ -89,6 +90,7 @@ class ConfidantClient(object):
                 ['~/.confidant', '/etc/confidant/config']
             profile: profile to read config values from.
             verify:  Whether we verify the servers TLS certificate.
+            timeout: Connect and read timeout in seconds. Default: 5
         """
         # Set defaults
         self.config = {
@@ -102,7 +104,8 @@ class ConfidantClient(object):
             'region': None,
             'retries': 0,
             'backoff': 1,
-            'verify': True
+            'verify': True,
+            'timeout': 5,
         }
         if config_files is None:
             config_files = ['~/.confidant', '/etc/confidant/config']
@@ -121,7 +124,8 @@ class ConfidantClient(object):
             'region': region,
             'backoff': backoff,
             'assume_role': assume_role,
-            'verify': verify
+            'verify': verify,
+            'timeout': timeout
         }
         for key, val in args_config.items():
             if val is not None:
@@ -597,7 +601,6 @@ class ConfidantClient(object):
             response = self._execute_request(
                 'post',
                 '{0}/v1/blind_credentials'.format(self.config['url']),
-                timeout=5,
                 headers=JSON_HEADERS,
                 data=json.dumps(data),
             )
@@ -676,7 +679,6 @@ class ConfidantClient(object):
             response = self._execute_request(
                 'put',
                 '{0}/v1/blind_credentials/{1}'.format(self.config['url'], id),
-                timeout=5,
                 headers=JSON_HEADERS,
                 data=json.dumps(data)
             )
@@ -830,7 +832,6 @@ class ConfidantClient(object):
             method,
             url,
             expected_return_codes=[200],
-            timeout=2,
             **kwargs
             ):
         try:
@@ -839,7 +840,7 @@ class ConfidantClient(object):
                     url,
                     auth=(self._get_username(), self._get_token()),
                     allow_redirects=False,
-                    timeout=timeout,
+                    timeout=self.config['timeout'],
                     **kwargs
                 )
             elif method == 'post':
@@ -847,7 +848,7 @@ class ConfidantClient(object):
                     url,
                     auth=(self._get_username(), self._get_token()),
                     allow_redirects=False,
-                    timeout=timeout,
+                    timeout=self.config['timeout'],
                     **kwargs
                 )
             elif method == 'put':
@@ -855,7 +856,7 @@ class ConfidantClient(object):
                     url,
                     auth=(self._get_username(), self._get_token()),
                     allow_redirects=False,
-                    timeout=timeout,
+                    timeout=self.config['timeout'],
                     **kwargs
                 )
             else:

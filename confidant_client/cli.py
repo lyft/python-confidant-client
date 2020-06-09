@@ -46,7 +46,8 @@ def _get_client_from_args(args):
         retries=args.retries,
         config_files=config_files,
         profile=args.profile,
-        verify=args.verify
+        verify=args.verify,
+        timeout=args.timeout
     )
     return client
 
@@ -92,6 +93,12 @@ def _parse_args():
         help=('Number of retries that should be attempted on confidant server'
               ' errors. Default 0.'),
         type=int
+    )
+    parser.add_argument(
+        '--timeout',
+        help=('Connect and read timeout in seconds to confidant server.'
+              ' Default 5.'),
+        type=int,
     )
     parser.add_argument(
         '-k',

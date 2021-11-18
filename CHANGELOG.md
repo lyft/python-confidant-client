@@ -1,6 +1,6 @@
 ## 2.2.0
 
-* changed dependency of cryptography >=1.2.1,<3.4.8.
+* changed dependency of cryptography >=1.2.1,<4.0.0
 
 ## 2.1.0
 

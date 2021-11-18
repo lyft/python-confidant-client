@@ -33,7 +33,7 @@ setup(
         # License: BSD
         # Upstream url: https://github.com/pyca/cryptography
         # Use: For encryption
-        'cryptography>=1.2.1,<3.0.0',
+        'cryptography>=1.2.1,<3.4.8',
 
         # Python HTTP for Humans.
         # License: Apache2

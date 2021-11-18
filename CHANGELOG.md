@@ -1,3 +1,7 @@
+## 2.2.0
+
+* remove upper bound for dependency of cryptography
+
 ## 2.1.0
 
 * Added a new timeout option, for being able to configure request timeouts.

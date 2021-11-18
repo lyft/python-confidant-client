@@ -1,3 +1,7 @@
+## 2.2.0
+
+* changed dependency of cryptography >=1.2.1,<3.4.8.
+
 ## 2.1.0
 
 * Added a new timeout option, for being able to configure request timeouts.

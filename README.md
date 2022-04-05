@@ -8,8 +8,8 @@ Docs
 
 * [Installation](https://lyft.github.io/confidant/install)
 * [Configuration](https://lyft.github.io/confidant/configuration)
-* [Usage](https://lyft.github.io/confidant/using_confidant.html)
-* [Contribution](https://lyft.github.io/confidant/contributing/)
+* [Usage](https://lyft.github.io/confidant/using_confidant)
+* [Contribution](https://lyft.github.io/confidant/contributing)
 
 Reporting security vulnerabilities
 ----------------------------------

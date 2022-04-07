@@ -645,7 +645,7 @@ class _HelpAction(argparse._HelpAction):
             'example: confidant get_service -u'
             ' "https://confidant-production.example.com" -k'
             ' "alias/authnz-production" --from myservice-production'
-            ' --to confidant-production --user_type service'
+            ' --to confidant-production --user-type service'
             ' --region us-west-2 --service myservice-production'
         )
 

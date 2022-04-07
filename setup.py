@@ -18,7 +18,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="confidant-client",
-    version="2.2.0",
+    version="2.2.1",
     packages=find_packages(exclude=["test*"]),
     install_requires=[
         # Boto3 is the Amazon Web Services (AWS) Software Development Kit (SDK)
@@ -93,7 +93,8 @@ setup(
     entry_points={
         "console_scripts": [
             "confidant = confidant_client.cli:main",
-            "confidant-format = confidant_client.formatter:main"
+            "confidant-format = confidant_client.formatter:main",
+            "confidant-env = confidant_client.env:main"
         ],
     },
     classifiers=[

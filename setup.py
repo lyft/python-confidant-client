@@ -93,8 +93,7 @@ setup(
     entry_points={
         "console_scripts": [
             "confidant = confidant_client.cli:main",
-            "confidant-format = confidant_client.formatter:main",
-            "confidant-env = confidant_client.env:main"
+            "confidant-format = confidant_client.formatter:main"
         ],
     },
     classifiers=[

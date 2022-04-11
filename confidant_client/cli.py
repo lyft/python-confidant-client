@@ -180,9 +180,18 @@ def _parse_args():
     )
     env_parser.add_argument(
         '--prefix',
-        help='Prefix env var keyname with this value.',
+        help=('Prefix env var keynames with this value.  '
+              'Defaults to CREDENTIALS_'),
         required=False,
         default='CREDENTIALS_'
+    )
+    env_parser.add_argument(
+        '--wrapped',
+        action='store_true',
+        dest='wrapped',
+        help=('Flag indicating that confidant was called by a command in'
+              'command_wrap defined in ~/.confidant'),
+        required=False,
     )
     env_parser.set_defaults(
         decrypt_blind=False
@@ -531,25 +540,37 @@ def main():
     )
 
     client = _get_client_from_args(args)
-
     ret = {'result': False}
 
     if args.subcommand == 'env':
-        try:
-            ret = client.get_service(
-                args.service,
-                args.decrypt_blind
-            )
-        except Exception:
-            logging.exception('An unexpected general error occurred.')
+        # If command_wrap is set in ~/.confidant then call 'confidant'
+        # with the command_wrap and pass in flag --wrapped indicating
+        # it's been wrapped so that we don't wrap again.
+        # eg: command_wrap = 'aws-vault exec lisa --'
+        # then the following will be called:
+        # 'aws-vault exec lisa -- confidant env --wrapped [command]
+        if client.config.get('command_wrap') and not args.wrapped:
+            cmd = client.config.get('command_wrap').split(" ") + \
+                  ["confidant", args.subcommand, "--wrapped"] + \
+                  sys.argv[2:]
+            os.execvpe(cmd[0], cmd, os.environ)
+        elif len(args.command):
+            try:
+                ret = client.get_service(
+                    args.service,
+                    args.decrypt_blind
+                )
+            except Exception:
+                logging.exception('An unexpected general error occurred.')
+                sys.exit(-1)
 
-        cred_pairs = {}
-        for cred in ret['service']['credentials']:
-            for k, v in cred['credential_pairs'].items():
-                cred_pairs[_format_cred_key(k, args.prefix)] = v
+            cred_pairs = {}
+            for cred in ret['service']['credentials']:
+                for k, v in cred['credential_pairs'].items():
+                    cred_pairs[_format_cred_key(k, args.prefix)] = v
 
-        environment_vars = {**os.environ, **cred_pairs}
-        os.execvpe(args.command[0], args.command, environment_vars)
+            environment_vars = {**os.environ, **cred_pairs}
+            os.execvpe(args.command[0], args.command, environment_vars)
         sys.exit(0)
     elif args.subcommand == 'get_service':
         try:

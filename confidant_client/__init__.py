@@ -61,7 +61,8 @@ class ConfidantClient(object):
             config_files=None,
             profile=None,
             verify=None,
-            timeout=None
+            timeout=None,
+            command_wrap=None,
             ):
         """Create a ConfidantClient object.
 
@@ -91,6 +92,10 @@ class ConfidantClient(object):
             profile: profile to read config values from.
             verify:  Whether we verify the servers TLS certificate.
             timeout: Connect and read timeout in seconds. Default: 5
+            command_wrap: command in string format to run before confidant.
+                Useful when authentication to AWS needs to occur to generate
+                temporary credentials.  Examples: aws-vault, saml2aws
+                Default None.
         """
         # Set defaults
         self.config = {
@@ -106,6 +111,7 @@ class ConfidantClient(object):
             'backoff': 1,
             'verify': True,
             'timeout': 5,
+            'command_wrap': None
         }
         if config_files is None:
             config_files = ['~/.confidant', '/etc/confidant/config']
@@ -125,7 +131,8 @@ class ConfidantClient(object):
             'backoff': backoff,
             'assume_role': assume_role,
             'verify': verify,
-            'timeout': timeout
+            'timeout': timeout,
+            'command_wrap': command_wrap,
         }
         for key, val in args_config.items():
             if val is not None:

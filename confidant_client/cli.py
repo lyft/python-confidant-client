@@ -10,10 +10,15 @@ import argparse
 import sys
 import getpass
 import re
+import os
 
 import confidant_client
 
 KEY_BAD_PATTERN = re.compile(r'(\W|^\d)')
+
+
+def _format_cred_key(key: str, prefix: str) -> str:
+    return f"{prefix}{key}".upper()
 
 
 def _get_client_from_args(args):
@@ -165,6 +170,25 @@ def _parse_args():
     parser.set_defaults(mfa=False)
 
     subparsers = parser.add_subparsers(dest='subcommand')
+    env_parser = subparsers.add_parser(
+        'env',
+        help=('Run a command with secrets injected as environmental variables'),
+    )
+    env_parser.add_argument(
+        '--service',
+        help='The service\'s secrets to get.'
+    )
+    env_parser.add_argument(
+        '--prefix',
+        help='Prefix env var keyname with this value.',
+        required=False,
+        default='CREDENTIALS_'
+    )
+    env_parser.set_defaults(
+        decrypt_blind=False
+    )
+    env_parser.add_argument('command', action='store', type=str, nargs='*')
+
     get_service_parser = subparsers.add_parser('get_service')
     get_service_parser.add_argument(
         '--service',
@@ -489,6 +513,7 @@ def _parse_args():
     subparsers.add_parser(
         'list_cas'
     )
+
     return parser.parse_args()
 
 
@@ -509,7 +534,24 @@ def main():
 
     ret = {'result': False}
 
-    if args.subcommand == 'get_service':
+    if args.subcommand == 'env':
+        try:
+            ret = client.get_service(
+                args.service,
+                args.decrypt_blind
+            )
+        except Exception:
+            logging.exception('An unexpected general error occurred.')
+
+        cred_pairs = {}
+        for cred in ret['service']['credentials']:
+            for k, v in cred['credential_pairs'].items():
+                cred_pairs[_format_cred_key(k, args.prefix)] = v
+
+        environment_vars = {**os.environ, **cred_pairs}
+        os.execvpe(args.command[0], args.command, environment_vars)
+        sys.exit(0)
+    elif args.subcommand == 'get_service':
         try:
             ret = client.get_service(
                 args.service,
@@ -642,10 +684,12 @@ class _HelpAction(argparse._HelpAction):
                 subparser.print_help()
 
         print(
-            'example: confidant get_service -u'
+            'examples: \n'
+            '  confidant env --service myservice-production env\n'
+            '  confidant get_service -u'
             ' "https://confidant-production.example.com" -k'
             ' "alias/authnz-production" --from myservice-production'
-            ' --to confidant-production --user_type service'
+            ' --to confidant-production --user-type service'
             ' --region us-west-2 --service myservice-production'
         )
 

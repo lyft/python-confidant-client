@@ -550,7 +550,7 @@ def main():
         # then the following will be called:
         # 'aws-vault exec lisa -- confidant env --wrapped [command]
         if client.config.get('command_wrap') and not args.wrapped:
-            cmd = client.config.get('command_wrap').split(" ") + \
+            cmd = client.config.get('command_wrap').split() + \
                   ["confidant", args.subcommand, "--wrapped"] + \
                   sys.argv[2:]
             os.execvpe(cmd[0], cmd, os.environ)

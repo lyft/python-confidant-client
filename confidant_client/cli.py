@@ -4,7 +4,7 @@
 # Import python libs
 from __future__ import absolute_import
 from __future__ import print_function
-from typing import Dict
+from confidant_client.lib import helper
 import logging
 import json
 import argparse
@@ -16,26 +16,6 @@ import os
 import confidant_client
 
 KEY_BAD_PATTERN = re.compile(r'(\W|^\d)')
-
-
-def _format_cred_key(key: str, prefix: str) -> str:
-    return f"{prefix}{key}".upper()
-
-
-# Avoids passing the user's AWS auth session into the running process by
-# removing environmental variables that have these keys
-# XXX: TODO move to ~/.confidant
-def _sanitize_secrets(secrets: Dict[str, str]) -> Dict[str, str]:
-    remove = ['AWS_ACCESS_KEY_ID',
-              'AWS_SECRET_ACCESS_KEY',
-              'AWS_SECURITY_TOKEN',
-              'AWS_SESSION_TOKEN']
-
-    for key in remove:
-        if secrets.get(key):
-            del secrets[key]
-
-    return secrets
 
 
 def _get_client_from_args(args):
@@ -568,8 +548,9 @@ def main():
         # 'aws-vault exec lisa -- confidant env --wrapped [command]
         if client.config.get('command_wrap') and not args.wrapped:
             cmd = client.config.get('command_wrap').split() + \
-                  ["confidant", args.subcommand, "--wrapped"] + \
-                  sys.argv[2:]
+                  ["confidant"] + sys.argv[1:]
+            # add --wrapped right after env subcommand
+            cmd.insert(cmd.index('env') + 1, '--wrapped')
             os.execvpe(cmd[0], cmd, os.environ)
         elif len(args.command):
             try:
@@ -582,11 +563,19 @@ def main():
                 sys.exit(-1)
 
             cred_pairs = {}
-            for cred in ret['service']['credentials']:
-                for k, v in cred['credential_pairs'].items():
-                    cred_pairs[_format_cred_key(k, args.prefix)] = v
+            try:
+                creds = ret['service']['credentials']
+            except KeyError:
+                logging.error("Service does not exist.")
+                sys.exit(-1)
 
-            environment_vars = _sanitize_secrets({**os.environ, **cred_pairs})
+            for cred in creds:
+                for k, v in cred['credential_pairs'].items():
+                    cred_pairs[helper.format_cred_key(k, args.prefix)] = v
+
+            os_env = os.environ.copy()
+            helper.sanitize_secrets(os_env)
+            environment_vars = {**os_env, **cred_pairs}
             os.execvpe(args.command[0], args.command, environment_vars)
         sys.exit(0)
     elif args.subcommand == 'get_service':

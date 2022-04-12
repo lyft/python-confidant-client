@@ -4,6 +4,7 @@
 # Import python libs
 from __future__ import absolute_import
 from __future__ import print_function
+from typing import Dict
 import logging
 import json
 import argparse
@@ -19,6 +20,22 @@ KEY_BAD_PATTERN = re.compile(r'(\W|^\d)')
 
 def _format_cred_key(key: str, prefix: str) -> str:
     return f"{prefix}{key}".upper()
+
+
+# Avoids passing the user's AWS auth session into the running process by
+# removing environmental variables that have these keys
+# XXX: TODO move to ~/.confidant
+def _sanitize_secrets(secrets: Dict[str, str]) -> Dict[str, str]:
+    remove = ['AWS_ACCESS_KEY_ID',
+              'AWS_SECRET_ACCESS_KEY',
+              'AWS_SECURITY_TOKEN',
+              'AWS_SESSION_TOKEN']
+
+    for key in remove:
+        if secrets.get(key):
+            del secrets[key]
+
+    return secrets
 
 
 def _get_client_from_args(args):
@@ -569,7 +586,7 @@ def main():
                 for k, v in cred['credential_pairs'].items():
                     cred_pairs[_format_cred_key(k, args.prefix)] = v
 
-            environment_vars = {**os.environ, **cred_pairs}
+            environment_vars = _sanitize_secrets({**os.environ, **cred_pairs})
             os.execvpe(args.command[0], args.command, environment_vars)
         sys.exit(0)
     elif args.subcommand == 'get_service':

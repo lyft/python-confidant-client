@@ -18,7 +18,6 @@ import confidant_client
 KEY_BAD_PATTERN = re.compile(r'(\W|^\d)')
 
 
-
 def _get_client_from_args(args):
     if args.mfa:
         mfa_pin = getpass.getpass('Enter the MFA code: ')

@@ -548,8 +548,9 @@ def main():
         # 'aws-vault exec lisa -- confidant env --wrapped [command]
         if client.config.get('command_wrap') and not args.wrapped:
             cmd = client.config.get('command_wrap').split() + \
-                  ["confidant", args.subcommand, "--wrapped"] + \
-                  sys.argv[2:]
+                  ["confidant"] + sys.argv[1:]
+            # add --wrapped right after env subcommand
+            cmd.insert(cmd.index('env') + 1, '--wrapped')
             os.execvpe(cmd[0], cmd, os.environ)
         elif len(args.command):
             try:
@@ -562,7 +563,13 @@ def main():
                 sys.exit(-1)
 
             cred_pairs = {}
-            for cred in ret['service']['credentials']:
+            try:
+                creds = ret['service']['credentials']
+            except KeyError:
+                logging.error("Service does not exist.")
+                sys.exit(-1)
+
+            for cred in creds:
                 for k, v in cred['credential_pairs'].items():
                     cred_pairs[helper.format_cred_key(k, args.prefix)] = v
 

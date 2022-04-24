@@ -63,6 +63,8 @@ class ConfidantClient(object):
             verify=None,
             timeout=None,
             command_wrap=None,
+            command_safety_regex=None,
+            command_safety_msg=None,
             ):
         """Create a ConfidantClient object.
 
@@ -96,6 +98,12 @@ class ConfidantClient(object):
                 Useful when authentication to AWS needs to occur to generate
                 temporary credentials.  Examples: aws-vault, saml2aws
                 Default None.
+            command_safety_regex: define regex where if matched on service,
+              will require flag --force.  Ex. Useful for displaying
+              warnings if we're attempting to run commands against
+              production vs staging
+            command_safety_msg: Warning message to display if
+              command_safety_regex has been matched
         """
         # Set defaults
         self.config = {
@@ -111,7 +119,9 @@ class ConfidantClient(object):
             'backoff': 1,
             'verify': True,
             'timeout': 5,
-            'command_wrap': None
+            'command_wrap': None,
+            'command_safety_regex': None,
+            'command_safety_msg': None,
         }
         if config_files is None:
             config_files = ['~/.confidant', '/etc/confidant/config']
@@ -133,6 +143,8 @@ class ConfidantClient(object):
             'verify': verify,
             'timeout': timeout,
             'command_wrap': command_wrap,
+            'command_safety_regex': command_safety_regex,
+            'command_safety_msg': command_safety_msg,
         }
         for key, val in args_config.items():
             if val is not None:

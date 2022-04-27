@@ -190,6 +190,15 @@ def _parse_args():
               'command_wrap defined in ~/.confidant'),
         required=False,
     )
+    env_parser.add_argument(
+        '--force',
+        action='store_true',
+        dest='force',
+        help=('If command_safety_regex in ~/.confidant is matched, '
+              '--force is required to run the command'),
+        default=False,
+        required=False,
+    )
     env_parser.set_defaults(
         decrypt_blind=False
     )
@@ -540,6 +549,16 @@ def main():
     ret = {'result': False}
 
     if args.subcommand == 'env':
+        safety_re = client.config.get('command_safety_regex')
+        if safety_re and re.search(safety_re, args.service) and not args.force:
+            msg = client.config.get(
+                'command_safety_msg',
+                'Fetching sensitive service credentials.  '
+                'Use --force to override'
+            )
+            logging.warning(msg)
+            sys.exit(-1)
+
         # If command_wrap is set in ~/.confidant then call 'confidant'
         # with the command_wrap and pass in flag --wrapped indicating
         # it's been wrapped so that we don't wrap again.

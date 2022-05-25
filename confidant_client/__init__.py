@@ -196,8 +196,10 @@ class ConfidantClient(object):
                 token_lifetime=self.config['token_lifetime'],
                 aws_creds=self.aws_creds
             )
-        except kmsauth.ConfigurationError:
-            raise ClientConfigurationError('Error configuring kmsauth client.')
+        except kmsauth.ConfigurationError as e:
+            kms_msg = str(e)
+            raise ClientConfigurationError('Error configuring kmsauth client: '
+                                           + kms_msg)
 
     def _load_config(self, config_files, profile):
         """Initialize client settings from config."""

@@ -713,6 +713,64 @@ class ConfidantClient(object):
         ret['result'] = True
         return ret
 
+    def get_credential(self, id):
+        """Retrieves a standard credential in Confidant by id"""
+        # Return a dict, always with an attribute that specifies whether or not
+        # the function was able to successfully get a result.
+        ret = {'result': False}
+
+        # Make a request to confidant with the provided url, to fetch the
+        # service providing the service name and base64 encoded
+        # token for authentication.
+
+        try: 
+            response = self._execute_request(
+                'get',
+                '{0}/v1/credentials/{1}'.format(self.config['url'], id),
+                expected_return_codes=[200, 404]
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        if response.status_code == 404:
+            logging.debug('Speficified redential not found in confidant.')
+            ret['result'] = False
+            return ret
+        data = response.json()
+
+        ret['result'] = True
+        ret['credential'] = data
+        return ret
+
+    def update_credential(
+            self, 
+            id,
+            credential_pairs):
+        """Updates a standard credential in Confidant by id"""
+        # Return a dict, always with an attribute that specifies whether or not
+        # the function was able to successfully get a result.
+        ret = {'result': False}
+
+        try: 
+            response = self._execute_request(
+                'put',
+                '{0}/v1/credentials/{1}'.format(self.config['url'], id),
+                json=json.dumps(credential_pairs),
+                expected_return_codes=[200, 404]
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        if response.status_code == 404:
+            logging.debug('Speficified redential not found in confidant.')
+            ret['result'] = False
+            return ret
+        data = response.json()
+
+        ret['result'] = True
+        ret['credential'] = data
+        return ret
+
     def list_blind_credentials(self):
         """Get a list of blind credentials."""
         # Return a dict, always with an attribute that specifies whether or not

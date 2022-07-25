@@ -723,7 +723,7 @@ class ConfidantClient(object):
         # service providing the service name and base64 encoded
         # token for authentication.
 
-        try: 
+        try:
             response = self._execute_request(
                 'get',
                 '{0}/v1/credentials/{1}'.format(self.config['url'], id),
@@ -743,7 +743,7 @@ class ConfidantClient(object):
         return ret
 
     def update_credential(
-            self, 
+            self,
             id,
             credential_pairs):
         """Updates a standard credential in Confidant by id"""
@@ -751,7 +751,7 @@ class ConfidantClient(object):
         # the function was able to successfully get a result.
         ret = {'result': False}
 
-        try: 
+        try:
             response = self._execute_request(
                 'put',
                 '{0}/v1/credentials/{1}'.format(self.config['url'], id),

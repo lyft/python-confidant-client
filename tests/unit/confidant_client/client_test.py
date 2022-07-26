@@ -543,3 +543,94 @@ class ClientTest(unittest.TestCase):
         )
         # TODO: test all arguments
         # TODO: test request exceptions
+
+    # @patch(
+    #     'confidant_client.services.get_boto_client',
+    #     MagicMock()
+    # )
+    # def test_get_credential(self):
+    #     client = confidant_client.ConfidantClient(
+    #         'http://localhost/',
+    #         'alias/authnz-testing',
+    #         {'from': 'confidant-unittest',
+    #          'to': 'test',
+    #          'user_type': 'service'},
+    #     )
+    #     client._get_token = MagicMock()
+    #     # Test 404. Should return True with no service entry since the call
+    #     # succeeded, but the credential didn't exist.
+    #     client.request_session.request = mock_404
+    #     self.maxDiff = None
+    #     self.assertEqual(
+    #         client.get_credential(
+    #             '12345',
+    #             False
+    #         ),
+    #         {'result': True}
+    #     )
+    #     # Test 200. Should return True with an empty dict, since that's how we
+    #     # have the service mocked out.
+    #     client.request_session.request = mock_200
+    #     self.assertEqual(
+    #         client.get_credential(
+    #             '12345',
+    #             False
+    #         ),
+    #         {'result': True, 'credential': {}}
+    #     )
+    #     # Test 500. Should return False as the request failed.
+    #     client.request_session.request = mock_500
+    #     self.assertEqual(
+    #         client.get_credential(
+    #             '12345',
+    #             False
+    #         ),
+    #         {'result': False}
+    #     )
+
+    # @patch(
+    #     'confidant_client.services.get_boto_client',
+    #     MagicMock()
+    # )
+    # def test_update_credential(self):
+    #     client = confidant_client.ConfidantClient(
+    #         'http://localhost/',
+    #         'alias/authnz-testing',
+    #         {'from': 'confidant-unittest',
+    #          'to': 'test',
+    #          'user_type': 'service'},
+    #     )
+    #     client._get_token = MagicMock()
+    #     # Test 404. Should return True with no service entry since the call
+    #     # succeeded, but the credential didn't exist.
+    #     client.request_session.request = mock_404
+    #     self.maxDiff = None
+    #     self.assertEqual(
+    #         client.update_credential(
+    #             '12345',
+    #             {'us-east-1', 'test'},
+    #             False
+    #         ),
+    #         {'result': True}
+    #     )
+    #     # Test 200. Should return True with an empty dict, since that's how we
+    #     # have the service mocked out.
+    #     client.request_session.request = mock_200
+    #     self.assertEqual(
+    #         client.update_credential(
+    #             '12345',
+    #             {'us-east-1', 'test'},
+    #             False
+    #         ),
+    #         {'result': True, 'credential': {}}
+    #     )
+    #     # Test 500. Should return False as the request failed.
+    #     client.request_session.request = mock_500
+    #     self.assertEqual(
+    #         client.update_credential(
+    #             '12345',
+    #             {'us-east-1', 'test'},
+    #             False
+    #         ),
+    #         {'result': False}
+    #     )

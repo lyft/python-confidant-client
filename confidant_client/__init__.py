@@ -727,7 +727,7 @@ class ConfidantClient(object):
             response = self._execute_request(
                 'get',
                 '{0}/v1/credentials/{1}'.format(self.config['url'], id),
-                expected_return_codes=[200, 404, 403]
+                expected_return_codes=[200, 404]
             )
         except RequestExecutionError:
             logging.exception('Error with executing request')
@@ -756,7 +756,7 @@ class ConfidantClient(object):
                 'put',
                 '{0}/v1/credentials/{1}'.format(self.config['url'], id),
                 json=json.dumps(credential_pairs),
-                expected_return_codes=[200, 404, 403]
+                expected_return_codes=[200, 404]
             )
         except RequestExecutionError:
             logging.exception('Error with executing request')

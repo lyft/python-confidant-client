@@ -634,7 +634,3 @@ class ClientTest(unittest.TestCase):
     #         ),
     #         {'result': False}
     #     )
-
-    
-
-    

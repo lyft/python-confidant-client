@@ -422,15 +422,20 @@ class ConfidantClient(object):
             return ret
 
         data_to_update = {}
-        if name is not None:
-            data_to_update['name'] = name
-        if metadata is not None:
-            data_to_update['metadata'] = metadata
-        if documentation is not None:
-            data_to_update['documentation'] = documentation
-        if credential_pairs is not None:
+
+        if credential_pairs:
             data_to_update['credential_pairs'] = credential_pairs
-        if enabled is not None:
+        else:
+            # required for updating other fields
+            data_to_update['credential_pairs'] = cred['credential']['credential_pairs']
+
+        if name:
+            data_to_update['name'] = name
+        if metadata:
+            data_to_update['metadata'] = metadata
+        if documentation:
+            data_to_update['documentation'] = documentation
+        if enabled:
             data_to_update['enabled'] = enabled
 
         try:

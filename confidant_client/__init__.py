@@ -427,7 +427,8 @@ class ConfidantClient(object):
             data_to_update['credential_pairs'] = credential_pairs
         else:
             # required for updating other fields
-            data_to_update['credential_pairs'] = cred['credential']['credential_pairs']
+            data_to_update['credential_pairs'] = \
+                cred['credential']['credential_pairs']
 
         if name:
             data_to_update['name'] = name

@@ -600,6 +600,11 @@ class ClientTest(unittest.TestCase):
         )
         client._get_token = MagicMock()
         client.request_session.request = mock_200
+        client.get_credential = MagicMock()
+        client.get_credential.return_value = {
+            'result': True,
+            'credential': {'credential_pairs': {}}
+        }
         self.assertEqual(
             client.update_credential(
                 'confidant-development',

@@ -48,7 +48,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install apt dependencies
-        run: sudo apt-get install -y python3-dev openssl libssl-dev gcc pkg-config libffi-dev libxml2-dev libxmlsec1-dev
+        run: apt-get update && sudo apt-get install -y python3-dev openssl libssl-dev gcc pkg-config libffi-dev libxml2-dev libxmlsec1-dev
       - name: Install dependencies
         run: pip install -r requirements.txt && pip install -e .
       - name: Run python tests

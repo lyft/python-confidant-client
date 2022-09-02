@@ -414,8 +414,8 @@ class ConfidantClient(object):
         ret = {'result': False}
 
         # Make a request to confidant with the provided url, to fetch the
-        # services using the credential providing the credential id and base64 encoded
-        # token for authentication.
+        # services using the credential providing the credential id and
+        # base64 encoded token for authentication.
         try:
             response = self._execute_request(
                 'get',

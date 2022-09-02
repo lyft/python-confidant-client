@@ -405,7 +405,10 @@ class ConfidantClient(object):
         return ret
 
     def get_credential_services(self, id):
-        """Get a credential's services from ID."""
+        """
+        Get the list of services that currently use this credential
+        and whether they are enabled or not
+        """
         # Return a dict, always with an attribute that specifies whether or not
         # the function was able to successfully get a result.
         ret = {'result': False}

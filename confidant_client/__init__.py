@@ -416,7 +416,8 @@ class ConfidantClient(object):
         try:
             response = self._execute_request(
                 'get',
-                '{0}/v1/credentials/{1}/services'.format(self.config['url'], id),
+                '{0}/v1/credentials/{1}/services'.format(self.config['url'],
+                                                         id),
                 expected_return_codes=[200, 404]
             )
         except RequestExecutionError:

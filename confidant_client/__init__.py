@@ -404,6 +404,40 @@ class ConfidantClient(object):
         ret['result'] = True
         return ret
 
+    def get_credential_services(self, id):
+        """Get a credential's services from ID."""
+        # Return a dict, always with an attribute that specifies whether or not
+        # the function was able to successfully get a result.
+        ret = {'result': False}
+
+        # Make a request to confidant with the provided url, to fetch the
+        # service providing the service name and base64 encoded
+        # token for authentication.
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/credentials/{1}/services'.format(self.config['url'], id),
+                expected_return_codes=[200, 404]
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+
+        if response.status_code == 404:
+            logging.debug('Credential not found in confidant.')
+            ret['result'] = False
+            return ret
+
+        try:
+            data = response.json()
+        except ValueError:
+            logging.error('Received badly formatted json data from confidant.')
+            return ret
+
+        ret['data'] = data
+        ret['result'] = True
+        return ret
+
     def update_credential(
             self,
             id,

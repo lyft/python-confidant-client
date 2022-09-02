@@ -590,6 +590,48 @@ class ClientTest(unittest.TestCase):
         'confidant_client.services.get_boto_client',
         MagicMock()
     )
+    def test_get_credential_services(self):
+        client = confidant_client.ConfidantClient(
+            'http://localhost/',
+            'alias/authnz-testing',
+            {'from': 'confidant-unittest',
+             'to': 'test',
+             'user_type': 'service'},
+        )
+        client._get_token = MagicMock()
+        client.request_session.request = mock_200
+        self.assertEqual(
+            client.get_credential_services(
+                'confidant-development'
+            ),
+            {'result': True, 'data': {}}
+        )
+
+    @patch(
+        'confidant_client.services.get_boto_client',
+        MagicMock()
+    )
+    def test_get_credential_services_not_found(self):
+        client = confidant_client.ConfidantClient(
+            'http://localhost/',
+            'alias/authnz-testing',
+            {'from': 'confidant-unittest',
+             'to': 'test',
+             'user_type': 'service'},
+        )
+        client._get_token = MagicMock()
+        client.request_session.request = mock_404
+        self.assertEqual(
+            client.get_credential_services(
+                'confidant-development',
+            ),
+            {'result': False}
+        )
+
+    @patch(
+        'confidant_client.services.get_boto_client',
+        MagicMock()
+    )
     def test_update_credential(self):
         client = confidant_client.ConfidantClient(
             'http://localhost/',

@@ -300,7 +300,7 @@ class ConfidantClient(object):
             return False
         return True
 
-    def get_service(self, service, decrypt_blind=False):
+    def get_service(self, service, decrypt_blind=False, metadata_only=False):
         """Get a service's metadata and secrets."""
         # Return a dict, always with an attribute that specifies whether or not
         # the function was able to successfully get a result.
@@ -312,7 +312,8 @@ class ConfidantClient(object):
             response = self._execute_request(
                 'get',
                 '{0}/v1/services/{1}'.format(self.config['url'], service),
-                expected_return_codes=[200, 404]
+                expected_return_codes=[200, 404],
+                params={'metadata_only': metadata_only},
             )
         except RequestExecutionError:
             logging.exception('Error with executing request')
@@ -370,7 +371,7 @@ class ConfidantClient(object):
         ret['result'] = True
         return ret
 
-    def get_credential(self, id):
+    def get_credential(self, id, metadata_only=False):
         """Get a credential from ID."""
         # Return a dict, always with an attribute that specifies whether or not
         # the function was able to successfully get a result.
@@ -383,7 +384,8 @@ class ConfidantClient(object):
             response = self._execute_request(
                 'get',
                 '{0}/v1/credentials/{1}'.format(self.config['url'], id),
-                expected_return_codes=[200, 404]
+                expected_return_codes=[200, 404],
+                params={'metadata_only': metadata_only},
             )
         except RequestExecutionError:
             logging.exception('Error with executing request')

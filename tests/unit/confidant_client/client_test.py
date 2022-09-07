@@ -258,6 +258,39 @@ class ClientTest(unittest.TestCase):
         'confidant_client.services.get_boto_client',
         MagicMock()
     )
+    def test_get_service_metadata_only(self):
+        client = confidant_client.ConfidantClient(
+            'http://localhost',
+            'alias/authnz-testing',
+            {'from': 'confidant-unittest',
+             'to': 'test',
+             'user_type': 'service'},
+        )
+        token_mock = MagicMock()
+        client._get_token = token_mock
+        client.request_session.request = mock_200
+        self.assertEqual(
+            client.get_service(
+                'confidant-development',
+                False,
+                metadata_only=True,
+            ),
+            {'result': True, 'service': {}}
+        )
+
+        client.request_session.request.assert_called_with(
+            'GET',
+            'http://localhost/v1/services/confidant-development',
+            auth=('2/service/confidant-unittest', token_mock()),
+            allow_redirects=False,
+            timeout=5,
+            params={'metadata_only': True}
+        )
+
+    @patch(
+        'confidant_client.services.get_boto_client',
+        MagicMock()
+    )
     def test_get_blind_credential(self):
         client = confidant_client.ConfidantClient(
             'http://localhost/',
@@ -563,6 +596,37 @@ class ClientTest(unittest.TestCase):
                 'confidant-development'
             ),
             {'result': True, 'credential': {}}
+        )
+
+    @patch(
+        'confidant_client.services.get_boto_client',
+        MagicMock()
+    )
+    def test_get_credential_metadata_only(self):
+        client = confidant_client.ConfidantClient(
+            'http://localhost',
+            'alias/authnz-testing',
+            {'from': 'confidant-unittest',
+             'to': 'test',
+             'user_type': 'service'},
+        )
+        token_mock = MagicMock()
+        client._get_token = token_mock
+        client.request_session.request = mock_200
+        self.assertEqual(
+            client.get_credential(
+                'confidant-development',
+                metadata_only=True
+            ),
+            {'result': True, 'credential': {}}
+        )
+        client.request_session.request.assert_called_with(
+            'GET',
+            'http://localhost/v1/credentials/confidant-development',
+            auth=('2/service/confidant-unittest', token_mock()),
+            allow_redirects=False,
+            timeout=5,
+            params={'metadata_only': True}
         )
 
     @patch(

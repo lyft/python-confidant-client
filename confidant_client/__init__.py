@@ -995,28 +995,15 @@ class ConfidantClient(object):
             cred['id']
             for cred in response['service']['blind_credentials']
         ]
-        payload = {
-            "id": service,
-            "account": response['service']['account'],
-            "enabled": response['service']['enabled'],
-            "credentials":  sorted(set(og_creds + credentials)),
-            "blind_credentials": sorted(
+        return self._update_service(
+            account=response['service']['account'],
+            enabled=response['service']['enabled'],
+            service=service,
+            credentials=sorted(set(og_creds + credentials)),
+            blind_credentials=sorted(
                 set(og_blind_creds + blind_credentials)
-            ),
-        }
-        ret = {'result': False}
-        try:
-            self._execute_request(
-                'put',
-                '{0}/v1/services/{1}'.format(self.config['url'], service),
-                json=payload
             )
-        except RequestExecutionError:
-            logging.exception('Error with executing request')
-            return ret
-
-        ret['result'] = True
-        return ret
+        )
 
     def remove_credentials_from_service(self,
                                         credentials,
@@ -1037,17 +1024,29 @@ class ConfidantClient(object):
             cred['id']
             for cred in response['service']['blind_credentials']
         ]
+        return self._update_service(
+            account=response['service']['account'],
+            enabled=response['service']['enabled'],
+            service=service,
+            credentials=sorted(set(og_creds) - set(credentials)),
+            blind_credentials=sorted(
+                set(og_blind_creds) - set(blind_credentials)
+            )
+        )
 
+    def _update_service(self,
+                        account,
+                        enabled,
+                        credentials,
+                        blind_credentials,
+                        service):
         payload = {
             "id": service,
-            "account": response['service']['account'],
-            "enabled": response['service']['enabled'],
-            "credentials":  sorted(set(og_creds) - set(credentials)),
-            "blind_credentials": sorted(
-                set(og_blind_creds) - set(blind_credentials)
-            ),
+            "account": account,
+            "enabled": enabled,
+            "credentials":  credentials,
+            "blind_credentials": blind_credentials,
         }
-
         ret = {'result': False}
         try:
             self._execute_request(

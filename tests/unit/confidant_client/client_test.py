@@ -755,7 +755,8 @@ class ClientTest(unittest.TestCase):
         )
         token_mock = MagicMock()
         client._get_token = token_mock
-        client.request_session.request = mock_200
+        client._update_service = MagicMock()
+        client._update_service.return_value = {'result': True}
         client.get_service = MagicMock()
         client.get_service.return_value = {
             'result': True,
@@ -776,20 +777,13 @@ class ClientTest(unittest.TestCase):
             ),
             {'result': True}
         )
-        client.request_session.request.assert_called_with(
-            'PUT',
-            'http://localhost//v1/services/confidant-development',
-            auth=('2/service/confidant-unittest', token_mock()),
-            allow_redirects=False,
-            timeout=5,
-            data=None,
-            json={
-                'id': 'confidant-development',
-                'account': None,
-                'enabled': True,
-                'credentials': ['a', 'b', 'c'],
-                'blind_credentials': ['x', 'y', 'z']
-            }
+
+        client._update_service.assert_called_with(
+            account=None,
+            enabled=True,
+            service='confidant-development',
+            credentials=['a', 'b', 'c'],
+            blind_credentials=['x', 'y', 'z']
         )
 
     def test_remove_credentials_to_service(self):
@@ -802,7 +796,8 @@ class ClientTest(unittest.TestCase):
         )
         token_mock = MagicMock()
         client._get_token = token_mock
-        client.request_session.request = mock_200
+        client._update_service = MagicMock()
+        client._update_service.return_value = {'result': True}
         client.get_service = MagicMock()
         client.get_service.return_value = {
             'result': True,
@@ -822,6 +817,36 @@ class ClientTest(unittest.TestCase):
             ),
             {'result': True}
         )
+        client._update_service.assert_called_with(
+            account=None,
+            enabled=True,
+            service='confidant-development',
+            credentials=['b', 'c'],
+            blind_credentials=['y', 'z']
+        )
+
+    def test_update_service(self):
+        client = confidant_client.ConfidantClient(
+            'http://localhost/',
+            'alias/authnz-testing',
+            {'from': 'confidant-unittest',
+             'to': 'test',
+             'user_type': 'service'},
+        )
+        token_mock = MagicMock()
+        client._get_token = token_mock
+        client.request_session.request = mock_200
+
+        self.assertEqual(
+            client._update_service(
+                account=None,
+                enabled=True,
+                credentials=['a', 'b', 'c'],
+                blind_credentials=['x', 'y', 'z'],
+                service='confidant-development'
+            ),
+            {'result': True}
+        )
         client.request_session.request.assert_called_with(
             'PUT',
             'http://localhost//v1/services/confidant-development',
@@ -833,7 +858,7 @@ class ClientTest(unittest.TestCase):
                 'id': 'confidant-development',
                 'account': None,
                 'enabled': True,
-                'credentials': ['b', 'c'],
-                'blind_credentials': ['y', 'z']
+                'credentials': ['a', 'b', 'c'],
+                'blind_credentials': ['x', 'y', 'z']
             }
         )

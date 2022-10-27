@@ -770,8 +770,8 @@ class ClientTest(unittest.TestCase):
 
         self.assertEqual(
             client.add_credentials_to_service(
-                credentials=['b','c'],
-                blind_credentials=['x','y','z'],
+                credentials=['b', 'c'],
+                blind_credentials=['x', 'y', 'z'],
                 service='confidant-development'
             ),
             {'result': True}

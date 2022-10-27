@@ -27,7 +27,7 @@ logging.getLogger('urllib3').setLevel(logging.WARNING)
 boto3.set_stream_logger(level=logging.WARNING)
 logging.getLogger('botocore').setLevel(logging.WARNING)
 
-VERSION = '2.0.2'
+VERSION = '2.4.0'
 JSON_HEADERS = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 TOKEN_SKEW = 3
 TIME_FORMAT = "%Y%m%dT%H%M%SZ"
@@ -973,6 +973,88 @@ class ConfidantClient(object):
             logging.error('Received badly formatted json data from confidant.')
             return ret
         ret['cas'] = data['cas']
+        ret['result'] = True
+        return ret
+
+    def add_credentials_to_service(self,
+                                   credentials,
+                                   blind_credentials,
+                                   service):
+        """Attach credentials to a service
+        """
+        if not credentials and not blind_credentials:
+            ret = {'result': False, 'error': 'No changes to make'}
+            return ret
+
+        response = self.get_service(service)
+        og_creds = [
+            cred['id']
+            for cred in response['service']['credentials']
+        ]
+        og_blind_creds = [
+            cred['id']
+            for cred in response['service']['blind_credentials']
+        ]
+        payload = {
+            "id": service,
+            "account": response['service']['account'],
+            "enabled": response['service']['enabled'],
+            "credentials":  sorted(set(og_creds + credentials)),
+            "blind_credentials": sorted(set(og_blind_creds + blind_credentials)),
+        }
+        ret = {'result': False}
+        try:
+            self._execute_request(
+                'put',
+                '{0}/v1/services/{1}'.format(self.config['url'], service),
+                json=payload
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+
+        ret['result'] = True
+        return ret
+
+    def remove_credentials_from_service(self,
+                                   credentials,
+                                   blind_credentials,
+                                   service):
+        """Remove credentials from a service
+        """
+        if not credentials and not blind_credentials:
+            ret = {'result': False, 'error': 'No changes to make'}
+            return ret
+
+        response = self.get_service(service)
+        og_creds = [
+            cred['id']
+            for cred in response['service']['credentials']
+        ]
+        og_blind_creds = [
+            cred['id']
+            for cred in response['service']['blind_credentials']
+        ]
+
+        payload = {
+            "id": service,
+            "account": response['service']['account'],
+            "enabled": response['service']['enabled'],
+            "credentials":  sorted(set(og_creds) - set(credentials)),
+            "blind_credentials": sorted(set(og_blind_creds) - set(blind_credentials)),
+        }
+
+        ret = {'result': False}
+        try:
+            self._execute_request(
+                'put',
+                '{0}/v1/services/{1}'.format(self.config['url'], service),
+                json=payload
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+
         ret['result'] = True
         return ret
 

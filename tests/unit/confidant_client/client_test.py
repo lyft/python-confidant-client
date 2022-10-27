@@ -740,3 +740,100 @@ class ClientTest(unittest.TestCase):
             ),
             {'result': False}
         )
+
+    @patch(
+        'confidant_client.services.get_boto_client',
+        MagicMock()
+    )
+    def test_add_credentials_to_service(self):
+        client = confidant_client.ConfidantClient(
+            'http://localhost/',
+            'alias/authnz-testing',
+            {'from': 'confidant-unittest',
+             'to': 'test',
+             'user_type': 'service'},
+        )
+        token_mock = MagicMock()
+        client._get_token = token_mock
+        client.request_session.request = mock_200
+        client.get_service = MagicMock()
+        client.get_service.return_value = {
+            'result': True,
+            'service': {
+                'account': None,
+                'blind_credentials': [],
+                'credentials': [{'id': 'a'}],
+                'enabled': True,
+                'id': 'aardvark-development-iad'
+            }
+        }
+
+        self.assertEqual(
+            client.add_credentials_to_service(
+                credentials=['b','c'],
+                blind_credentials=['x','y','z'],
+                service='confidant-development'
+            ),
+            {'result': True}
+        )
+        client.request_session.request.assert_called_with(
+            'PUT',
+            'http://localhost//v1/services/confidant-development',
+            auth=('2/service/confidant-unittest', token_mock()),
+            allow_redirects=False,
+            timeout=5,
+            data=None,
+            json={
+                'id': 'confidant-development',
+                'account': None,
+                'enabled': True,
+                'credentials': ['a', 'b', 'c'],
+                'blind_credentials': ['x', 'y', 'z']
+            }
+        )
+
+    def test_remove_credentials_to_service(self):
+        client = confidant_client.ConfidantClient(
+            'http://localhost/',
+            'alias/authnz-testing',
+            {'from': 'confidant-unittest',
+             'to': 'test',
+             'user_type': 'service'},
+        )
+        token_mock = MagicMock()
+        client._get_token = token_mock
+        client.request_session.request = mock_200
+        client.get_service = MagicMock()
+        client.get_service.return_value = {
+            'result': True,
+            'service': {
+                'account': None,
+                'blind_credentials': [{'id': 'x'}, {'id': 'y'}, {'id': 'z'}],
+                'credentials': [{'id': 'a'}, {'id': 'b'}, {'id': 'c'}],
+                'enabled': True,
+                'id': 'aardvark-development-iad'
+            }
+        }
+        self.assertEqual(
+            client.remove_credentials_from_service(
+                credentials=['a'],
+                blind_credentials=['x'],
+                service='confidant-development'
+            ),
+            {'result': True}
+        )
+        client.request_session.request.assert_called_with(
+            'PUT',
+            'http://localhost//v1/services/confidant-development',
+            auth=('2/service/confidant-unittest', token_mock()),
+            allow_redirects=False,
+            timeout=5,
+            data=None,
+            json={
+                'id': 'confidant-development',
+                'account': None,
+                'enabled': True,
+                'credentials': ['b', 'c'],
+                'blind_credentials': ['y', 'z']
+            }
+        )

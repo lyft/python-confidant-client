@@ -1000,7 +1000,9 @@ class ConfidantClient(object):
             "account": response['service']['account'],
             "enabled": response['service']['enabled'],
             "credentials":  sorted(set(og_creds + credentials)),
-            "blind_credentials": sorted(set(og_blind_creds + blind_credentials)),
+            "blind_credentials": sorted(
+                set(og_blind_creds + blind_credentials)
+            ),
         }
         ret = {'result': False}
         try:
@@ -1017,9 +1019,9 @@ class ConfidantClient(object):
         return ret
 
     def remove_credentials_from_service(self,
-                                   credentials,
-                                   blind_credentials,
-                                   service):
+                                        credentials,
+                                        blind_credentials,
+                                        service):
         """Remove credentials from a service
         """
         if not credentials and not blind_credentials:
@@ -1041,7 +1043,9 @@ class ConfidantClient(object):
             "account": response['service']['account'],
             "enabled": response['service']['enabled'],
             "credentials":  sorted(set(og_creds) - set(credentials)),
-            "blind_credentials": sorted(set(og_blind_creds) - set(blind_credentials)),
+            "blind_credentials": sorted(
+                set(og_blind_creds) - set(blind_credentials)
+            ),
         }
 
         ret = {'result': False}

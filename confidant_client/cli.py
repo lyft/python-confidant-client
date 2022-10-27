@@ -506,7 +506,7 @@ def _parse_args():
     )
     ca_get_certificate_from_csr_parser.add_argument(
         '--csr-file',
-        help=('A cerftificate signing request (CSR) file to issue a certificate'
+        help=('A certificate signing request (CSR) file to issue a certificate'
               'from.'),
     )
     ca_get_certificate_from_csr_parser.add_argument(
@@ -530,14 +530,16 @@ def _parse_args():
     )
 
     add_creds_to_service_parser = subparsers.add_parser(
-        'add_creds'
+        'add_creds',
+        help=('Add credential ids to a service'),
     )
     add_creds_to_service_parser.add_argument(
         '--cred-ids',
         type=str,
         nargs='+',
         dest='cred_ids',
-        default=[]
+        default=[],
+        help=('list of credential ids, separated by whitespace'),
     )
     add_creds_to_service_parser.add_argument(
         '--blind-cred-ids',
@@ -545,29 +547,33 @@ def _parse_args():
         nargs='+',
         dest='blind_cred_ids',
         default=[],
+        help=('list of credential ids, separated by whitespace'),
     )
     add_creds_to_service_parser.add_argument(
         '--service-id',
         type=str,
-        dest='service_id'
+        dest='service_id',
     )
 
     rm_creds_from_service_parser = subparsers.add_parser(
-        'remove_creds'
+        'remove_creds',
+        help=('Remove credential ids to a service'),
     )
     rm_creds_from_service_parser.add_argument(
         '--cred-ids',
         type=str,
         nargs='+',
         dest='cred_ids',
-        default=[]
+        default=[],
+        help=('list of credential ids, separated by whitespace'),
     )
     rm_creds_from_service_parser.add_argument(
         '--blind-cred-ids',
         type=int,
         nargs='+',
         dest='blind_cred_ids',
-        default=[]
+        default=[],
+        help=('list of credential ids, separated by whitespace'),
     )
     rm_creds_from_service_parser.add_argument(
         '--service-id',
@@ -753,8 +759,6 @@ def main():
             ret = client.list_cas()
         except Exception:
             logging.exception('An unexpected general error occurred.')
-
-
     elif args.subcommand == 'add_creds':
         try:
             ret = client.add_credentials_to_service(

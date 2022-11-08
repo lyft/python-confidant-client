@@ -582,6 +582,16 @@ def _parse_args():
         required=True,
     )
 
+    get_jwt = subparsers.add_parser(
+        'get_jwt',
+        help='Generate a JWT for the authenticated user',
+    )
+    get_jwt.add_argument(
+        '--environment',
+        type=str,
+        dest='environment',
+        required=True,
+    )
     return parser.parse_args()
 
 
@@ -775,6 +785,11 @@ def main():
                 blind_credentials=args.blind_cred_ids,
                 service=args.service_id
             )
+        except Exception:
+            logging.exception('An unexpected general error occurred.')
+    elif args.subcommand == 'get_jwt':
+        try:
+            ret = client.get_jwt(args.environment)
         except Exception:
             logging.exception('An unexpected general error occurred.')
 

@@ -500,6 +500,23 @@ class ConfidantClient(object):
         ret['result'] = True
         return ret
 
+    def get_jwt(self, environment):
+        ret = {'result': False}
+        try:
+            response = self._execute_request(
+                'get',
+                '{0}/v1/jwks/token'.format(self.config['url'], id),
+                params={'environment': environment},
+            )
+            data = response.json()
+            ret.update(data)
+        except RequestExecutionError:
+            logging.exception('Error with executing request: ')
+            return ret
+
+        ret['result'] = True
+        return ret
+
     def _decrypt_blind_credentials(self, blind_credentials):
         _blind_credentials = []
         for blind_credential in blind_credentials:

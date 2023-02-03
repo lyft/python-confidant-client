@@ -863,6 +863,31 @@ class ClientTest(unittest.TestCase):
             }
         )
 
+    def test_get_jwt_no_resource(self):
+        client = confidant_client.ConfidantClient(
+            'http://localhost',
+            'alias/authnz-testing',
+            {'from': 'confidant-unittest',
+             'to': 'test',
+             'user_type': 'service'},
+        )
+        token_mock = MagicMock()
+        client._get_token = token_mock
+        client.request_session.request = mock_200
+
+        self.assertEqual(
+            client.get_jwt('development', None),
+            {'result': True}
+        )
+        client.request_session.request.assert_called_with(
+            'GET',
+            'http://localhost/v1/jwks/token',
+            auth=('2/service/confidant-unittest', token_mock()),
+            allow_redirects=False,
+            timeout=5,
+            params={'environment': 'development'},
+        )
+
     def test_get_jwt(self):
         client = confidant_client.ConfidantClient(
             'http://localhost',
@@ -876,12 +901,12 @@ class ClientTest(unittest.TestCase):
         client.request_session.request = mock_200
 
         self.assertEqual(
-            client.get_jwt('development'),
+            client.get_jwt('development', 'test-resource'),
             {'result': True}
         )
         client.request_session.request.assert_called_with(
             'GET',
-            'http://localhost/v1/jwks/token',
+            'http://localhost/v1/jwks/token/test-resource',
             auth=('2/service/confidant-unittest', token_mock()),
             allow_redirects=False,
             timeout=5,

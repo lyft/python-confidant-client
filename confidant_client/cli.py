@@ -592,6 +592,12 @@ def _parse_args():
         dest='environment',
         required=True,
     )
+    get_jwt.add_argument(
+        '--resource-id',
+        type=str,
+        dest='resource_id',
+        default=None,
+    )
     return parser.parse_args()
 
 

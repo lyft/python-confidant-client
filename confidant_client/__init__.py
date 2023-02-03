@@ -500,12 +500,16 @@ class ConfidantClient(object):
         ret['result'] = True
         return ret
 
-    def get_jwt(self, environment):
+    def get_jwt(self, environment, resource_id):
         ret = {'result': False}
+        url = '{0}/v1/jwks/token'.format(self.config['url'])
+        if resource_id:
+            url += '/{0}'.format(resource_id)
+
         try:
             response = self._execute_request(
                 'get',
-                '{0}/v1/jwks/token'.format(self.config['url'], id),
+                url,
                 params={'environment': environment},
             )
             data = response.json()

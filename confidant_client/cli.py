@@ -598,6 +598,90 @@ def _parse_args():
         dest='resource_id',
         default=None,
     )
+
+    create_cred_parser = subparsers.add_parser(
+        'create_credential',
+        help='Create a credential in confidant',
+    )
+    create_cred_parser.add_argument(
+        '--name',
+        required=True,
+        help='The name of the credential',
+    )
+    create_cred_parser.add_argument(
+        '--credential-pairs',
+        required=True,
+        help=('A dict of key/value pairs for credentials in json format i.e.'
+              '\'{"ssl_key":"----- BEGIN...","ssl_cert":"----- BEGIN..."}\'.'),
+        type=json.loads
+    )
+    create_cred_parser.add_argument(
+        '--documentation',
+        required=True,
+        help='Documentation on how to rotate this credential'
+    )
+    create_cred_parser.add_argument(
+        '--enabled',
+        help='Enable this credential (default).',
+        action='store_true',
+        dest='enabled'
+    )
+    create_cred_parser.add_argument(
+        '--metadata',
+        help=('A dictionary of arbitrary key/value pairs for custom'
+              'per-credential end-user extensions. This is not'
+              'encrypted at rest.'),
+        type=json.loads,
+    )
+    create_cred_parser.set_defaults(
+        enabled=True,
+        metadata={}
+    )
+
+    update_cred_parser = subparsers.add_parser(
+        'update_credential',
+        help='Update a credential in confidant',
+    )
+    update_cred_parser.add_argument(
+        '--id',
+        required=True,
+        help='The id of the credential to update',
+        dest='_id'
+    )
+    update_cred_parser.add_argument(
+        '--name',
+        help='The name of the credential',
+    )
+    update_cred_parser.add_argument(
+        '--credential-pairs',
+        required=True,
+        help=('A dict of key/value pairs for credentials in json format i.e.'
+              '\'{"ssl_key":"----- BEGIN...","ssl_cert":"----- BEGIN..."}\'.'),
+        type=json.loads
+    )
+    update_cred_parser.add_argument(
+        '--documentation',
+        required=True,
+        help='Documentation on how to rotate this credential'
+    )
+    update_cred_parser.add_argument(
+        '--enabled',
+        help='Enable this credential (default).',
+        action='store_true',
+        dest='enabled'
+    )
+    update_cred_parser.add_argument(
+        '--metadata',
+        help=('A dictionary of arbitrary key/value pairs for custom'
+              'per-credential end-user extensions. This is not'
+              'encrypted at rest.'),
+        type=json.loads,
+    )
+    update_cred_parser.set_defaults(
+        enabled=True,
+        metadata={}
+    )
+
     return parser.parse_args()
 
 
@@ -796,6 +880,29 @@ def main():
     elif args.subcommand == 'get_jwt':
         try:
             ret = client.get_jwt(args.environment, args.resource_id)
+        except Exception:
+            logging.exception('An unexpected general error occurred.')
+    elif args.subcommand == 'create_credential':
+        try:
+            ret = client.create_credential(
+                args.name,
+                args.credential_pairs,
+                args.metadata,
+                args.enabled,
+                args.documentation
+            )
+        except Exception:
+            logging.exception('An unexpected general error occurred.')
+    elif args.subcommand == 'update_credential':
+        try:
+            ret = client.update_credential(
+                args._id,
+                args.name,
+                args.credential_pairs,
+                args.metadata,
+                args.enabled,
+                args.documentation
+            )
         except Exception:
             logging.exception('An unexpected general error occurred.')
 

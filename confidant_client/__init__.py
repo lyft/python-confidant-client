@@ -444,6 +444,46 @@ class ConfidantClient(object):
         ret['result'] = True
         return ret
 
+    def create_credential(
+            self,
+            name=None,
+            credential_pairs=None,
+            metadata=None,
+            enabled=None,
+            documentation=None
+    ):
+        """Create a credential and store it in Confidant."""
+        # Return a dict, always with an attribute that specifies whether or not
+        # the function was able to successfully get a result.
+        ret = {'result': False}
+        if metadata is None:
+            metadata = {}
+        data = {
+            'name': name,
+            'credential_pairs': credential_pairs,
+            'metadata': metadata,
+            'enabled': enabled,
+            'documentation': documentation
+        }
+        try:
+            response = self._execute_request(
+                'post',
+                f'{self.config['url']}/v1/credentials',
+                headers=JSON_HEADERS,
+                data=json.dumps(data),
+            )
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+        try:
+            data = response.json()
+        except ValueError:
+            logging.error('Received badly formatted json data from confidant.')
+            return ret
+        ret['credential'] = data
+        ret['result'] = True
+        return ret
+
     def update_credential(
             self,
             id,

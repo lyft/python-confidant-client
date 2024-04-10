@@ -1,4 +1,4 @@
-confidant-client 
+confidant-client
 ================
 
 A client for [confidant](https://lyft.github.io).

@@ -654,6 +654,42 @@ class ClientTest(unittest.TestCase):
         'confidant_client.services.get_boto_client',
         MagicMock()
     )
+    def test_create_credential(self):
+        client = confidant_client.ConfidantClient(
+            'http://localhost/',
+            'alias/authnz-testing',
+            {'from': 'confidant-unittest',
+             'to': 'test',
+             'user_type': 'service'},
+        )
+        client._get_token = MagicMock()
+        client.request_session.request = mock_500
+        self.assertEqual(
+            client.create_credential(
+                'test-credential',
+                {'key1': 'val1'},
+                {},
+                True,
+                'Test Documentation'
+            ),
+            {'result': False}
+        )
+        client.request_session.request = mock_200
+        self.assertEqual(
+            client.create_credential(
+                'test-credential',
+                {'key1': 'val1'},
+                {},
+                True,
+                'Test Documentation'
+            ),
+            {'result': True, 'credential': {}}
+        )
+
+    @patch(
+        'confidant_client.services.get_boto_client',
+        MagicMock()
+    )
     def test_get_credential_services(self):
         client = confidant_client.ConfidantClient(
             'http://localhost/',

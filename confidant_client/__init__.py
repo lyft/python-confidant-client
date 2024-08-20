@@ -322,6 +322,11 @@ class ConfidantClient(object):
             logging.debug('Service not found in confidant.')
             ret['result'] = True
             return ret
+        if response.status_code == 403:
+            logging.debug('Access denied to service in confidant.')
+            ret['result'] = False
+            ret = {**ret, **response.json()}
+            return ret
         try:
             data = response.json()
             if decrypt_blind:

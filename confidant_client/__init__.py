@@ -312,7 +312,7 @@ class ConfidantClient(object):
             response = self._execute_request(
                 'get',
                 '{0}/v1/services/{1}'.format(self.config['url'], service),
-                expected_return_codes=[200, 404],
+                expected_return_codes=[200, 403, 404],
                 params={'metadata_only': metadata_only},
             )
         except RequestExecutionError:

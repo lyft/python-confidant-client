@@ -5,4 +5,4 @@ test: test_unit
 
 test_unit:
 	mkdir -p build
-	nosetests tests/unit
+	pytest tests/unit

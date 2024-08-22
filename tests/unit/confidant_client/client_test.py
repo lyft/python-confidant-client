@@ -79,13 +79,13 @@ class ClientTest(unittest.TestCase):
                 # invalid token version
                 token_version=3
             )
-        assert(confidant_client.ConfidantClient(
+        assert (confidant_client.ConfidantClient(
             'http://localhost/',
             'alias/authnz-testing',
             {'from': 'test', 'to': 'test'},
             token_version=1
         ))
-        assert(confidant_client.ConfidantClient(
+        assert (confidant_client.ConfidantClient(
             'http://localhost/',
             'alias/authnz-testing',
             {'from': 'test', 'to': 'test', 'user_type': 'service'}

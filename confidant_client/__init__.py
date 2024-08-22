@@ -932,7 +932,7 @@ class ConfidantClient(object):
         try:
             response = self._execute_request(
                 'post',
-                '{0}/v1/certificates/{1}'.format(
+                '{0}/v1/certificates/{1}'.format(  # noqa: F522
                     self.config['url'],
                     ca,
                     data={

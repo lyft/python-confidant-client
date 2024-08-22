@@ -312,7 +312,7 @@ class ConfidantClient(object):
             response = self._execute_request(
                 'get',
                 '{0}/v1/services/{1}'.format(self.config['url'], service),
-                expected_return_codes=[200, 404],
+                expected_return_codes=[200, 403, 404],
                 params={'metadata_only': metadata_only},
             )
         except RequestExecutionError:
@@ -321,6 +321,10 @@ class ConfidantClient(object):
         if response.status_code == 404:
             logging.debug('Service not found in confidant.')
             ret['result'] = True
+            return ret
+        if response.status_code == 403:
+            logging.debug('Access denied to service in confidant.')
+            ret = {**ret, **response.json()}
             return ret
         try:
             data = response.json()

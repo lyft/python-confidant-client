@@ -1,3 +1,7 @@
+## 2.5.4
+
+* add 403 as a valid response code for get_service call
+
 ## 2.5.3
 
 * upgrade to python3.10

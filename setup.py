@@ -88,6 +88,8 @@ setup(
     author="Ryan Lane",
     author_email="rlane@lyft.com",
     description="A client for confidant, a secret management system.",
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     license="apache2",
     url="https://github.com/lyft/python-confidant-client",
     entry_points={

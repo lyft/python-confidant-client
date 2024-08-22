@@ -1,3 +1,7 @@
+## 2.5.3
+
+* upgrade to python3.10
+
 ## 2.2.0
 
 * remove upper bound for dependency of cryptography

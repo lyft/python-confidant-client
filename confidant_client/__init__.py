@@ -527,7 +527,7 @@ class ConfidantClient(object):
 
         ret['result'] = True
         return ret
-    
+
     def get_jwks(self, environment):
         ret = {'result': False, 'keys': []}
         url = '{0}/v1/jwks/public/{1}'.format(self.config['url'], environment)

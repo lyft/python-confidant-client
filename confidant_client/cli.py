@@ -597,12 +597,14 @@ def _parse_args():
         type=str,
         dest='resource_id',
         default=None,
+        help='The actual name of the resource to generate a JWT for',
     )
     get_jwt.add_argument(
         '--expiry',
         type=int,
         dest='expiry',
         default=None,
+        help='The expiry of the JWT in seconds',
     )
     return parser.parse_args()
 

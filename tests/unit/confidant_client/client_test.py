@@ -952,7 +952,7 @@ class ClientTest(unittest.TestCase):
 
         self.assertEqual(
             client.get_jwks('development'),
-            {'result': True}
+            {'result': True, 'keys': {}}
         )
         client.request_session.request.assert_called_with(
             'GET',

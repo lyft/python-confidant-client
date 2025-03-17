@@ -529,7 +529,7 @@ class ConfidantClient(object):
         return ret
 
     def get_jwks(self, environment):
-        ret = {'result': False, 'keys': []}
+        ret = {'result': False, 'keys': {}}
         url = '{0}/v1/jwks/public/{1}'.format(self.config['url'], environment)
 
         try:
@@ -540,7 +540,7 @@ class ConfidantClient(object):
             data = response.json()
             ret['keys'] = data
         except RequestExecutionError:
-            logging.exception('Error with executing request: ')
+            logging.exception('Error with executing request')
             return ret
 
         ret['result'] = True

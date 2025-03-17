@@ -801,7 +801,8 @@ def main():
             logging.exception('An unexpected general error occurred.')
     elif args.subcommand == 'get_jwt':
         try:
-            ret = client.get_jwt(args.environment, args.resource_id, args.expiry)
+            ret = client.get_jwt(args.environment, args.resource_id,
+                                 args.expiry)
         except Exception:
             logging.exception('An unexpected general error occurred.')
 

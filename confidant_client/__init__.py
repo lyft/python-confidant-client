@@ -509,7 +509,7 @@ class ConfidantClient(object):
         url = '{0}/v1/jwks/token'.format(self.config['url'])
         if resource_id:
             url += '/{0}'.format(resource_id)
-        
+
         if expiry:
             url += '/{0}'.format(expiry)
 

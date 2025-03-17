@@ -598,6 +598,12 @@ def _parse_args():
         dest='resource_id',
         default=None,
     )
+    get_jwt.add_argument(
+        '--expiry',
+        type=int,
+        dest='expiry',
+        default=None,
+    )
     return parser.parse_args()
 
 
@@ -795,7 +801,7 @@ def main():
             logging.exception('An unexpected general error occurred.')
     elif args.subcommand == 'get_jwt':
         try:
-            ret = client.get_jwt(args.environment, args.resource_id)
+            ret = client.get_jwt(args.environment, args.resource_id, args.expiry)
         except Exception:
             logging.exception('An unexpected general error occurred.')
 

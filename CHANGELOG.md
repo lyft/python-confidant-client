@@ -1,3 +1,7 @@
+## 2.6.4
+
+* add create jwt function to get_jwt
+
 ## 2.5.4
 
 * add 403 as a valid response code for get_service call

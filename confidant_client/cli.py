@@ -606,6 +606,18 @@ def _parse_args():
         default=None,
         help='The expiry of the JWT in seconds',
     )
+
+    get_jwks = subparsers.add_parser(
+        'get_jwks',
+        help='Retrieve a public JWKS for the requested environment',
+    )
+    get_jwks.add_argument(
+        '--environment',
+        type=str,
+        dest='environment',
+        required=True,
+    )
+
     return parser.parse_args()
 
 
@@ -805,6 +817,11 @@ def main():
         try:
             ret = client.get_jwt(args.environment, args.resource_id,
                                  args.expiry)
+        except Exception:
+            logging.exception('An unexpected general error occurred.')
+    elif args.subcommand == 'get_jwks':
+        try:
+            ret = client.get_jwks(args.environment)
         except Exception:
             logging.exception('An unexpected general error occurred.')
 

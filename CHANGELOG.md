@@ -1,3 +1,7 @@
+## 2.7.1
+
+* Update get_jwks format
+
 ## 2.7.0
 
 * add get_jwks

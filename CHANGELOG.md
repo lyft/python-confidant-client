@@ -1,3 +1,7 @@
+## 2.7.0
+
+* add get_jwks
+
 ## 2.6.4
 
 * add create jwt function to get_jwt

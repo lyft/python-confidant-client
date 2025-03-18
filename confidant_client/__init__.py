@@ -528,6 +528,24 @@ class ConfidantClient(object):
         ret['result'] = True
         return ret
 
+    def get_jwks(self, environment):
+        ret = {'result': False, 'keys': {}}
+        url = '{0}/v1/jwks/public/{1}'.format(self.config['url'], environment)
+
+        try:
+            response = self._execute_request(
+                'get',
+                url,
+            )
+            data = response.json()
+            ret['keys'] = data
+        except RequestExecutionError:
+            logging.exception('Error with executing request')
+            return ret
+
+        ret['result'] = True
+        return ret
+
     def _decrypt_blind_credentials(self, blind_credentials):
         _blind_credentials = []
         for blind_credential in blind_credentials:
